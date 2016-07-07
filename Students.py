@@ -35,7 +35,7 @@ class Student:
         return user
 
 
-def get_students(user_file):
+def load_students(user_file):
     users = []
     with open(user_file) as f:
         users_csv = csv.reader(f, delimiter=';')
@@ -56,24 +56,24 @@ def get_groups():
 
 
 def register_students(user_file, groups):
-    students = get_students(user_file)
+    students = load_students(user_file)
     _student_insertion(students)
     _group_assignation(students, groups)
 
 
-# TODO: Forget about get_registered_usernames and rely on http and exceptions
 def _student_insertion(students):
-    registered = get_registered_usernames()
     for student in students:
-        if student.unice_id in registered:
-            print('The student {} is already registered'.format(student.fullname))
-        else:
-            try:
-                req.post('crowd', 'user', json=student.get_crowd_format())
-                print('The student {} has been registered'.format(student.fullname))
-            except Exception as e:
-                print('Could not register {}'.format(student.fullname))
-                print('Reason: ', e)
+        try:
+            req.post('crowd', 'user', json=student.get_crowd_format())
+            print('The student {} has been registered'.format(student.fullname))
+        except requests.exceptions.HTTPError as e:
+            print('Could not register {}'.format(student.fullname))
+            reason = {
+                400: 'Malformed request or the username {}: {} already exists'.format(student.unice_id,
+                                                                                      student.fullname),
+                403: 'The application is not allowed to create user {}'.format(student.fullname)
+            }.get(e.response.status_code, str(e))
+            print('Reason: {}'.format(reason))
 
 
 def _group_assignation(students, groups):
@@ -93,19 +93,16 @@ def _group_assignation(students, groups):
                              'name': group
                          })
             except requests.exceptions.HTTPError as e:
-                code = e.response.status_code
                 print('Could not add {} to group {}'.format(student.fullname, group))
-                if code == 404:
-                    reason = 'User {} does not exist'.format(student.fullname)
-                elif code == 409:
-                    reason = 'User {} is already a member of the group {}'.format(student.fullname, group)
-                else:
-                    reason = e
+                reason = {
+                    404: 'User {} does not exist'.format(student.fullname),
+                    409: 'User {} is already a member of the group {}'.format(student.fullname, group)
+                }.get(e.response.status_code, str(e))
                 print('Reason: {}'.format(reason))
 
 
 def delete_students(user_file):
-    students = get_students(user_file)
+    students = load_students(user_file)
     registered = get_registered_usernames()
     for student in students:
         if student.unice_id not in registered:
