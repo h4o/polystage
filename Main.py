@@ -1,10 +1,6 @@
-import Students
+import Groups
+import Users
 
-# Students.delete_students('students.csv')
-Students.register_students('students.csv', ['jira-users'])
-
-# students = Students.load_students('students.csv')
-# Students._group_assignation(students, ['jira-users'])
-
-# print(Students.get_registered_usernames())
-
+Groups.delete(['4a-2015'])
+Users.remove_students('students.csv')
+Users.import_students('students.csv', ['jira-users', '4a-2015'], create_groups=True)

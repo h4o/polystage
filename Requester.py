@@ -20,47 +20,59 @@ class Requester:
         data = cred['credentials']
 
         auth_url = os.path.join(self.roots['jira'], 'rest/auth/1/session/')
-
         auth_jira = self.s.post(auth_url, json=data, verify=False)
 
         if auth_jira.status_code != 200:
             raise Exceptions.CouldNotLog()
 
     def get(self, platform, request, **kwargs):
-        request = self._get_request(platform, request)
-        return self._get_rec(request, 0, self._get_auth(platform), **kwargs)
+        return self._request('get', platform, request, **kwargs)
 
     def post(self, platform, request, **kwargs):
-        auth = self._get_auth(platform)
-        request = self._get_request(platform, request)
-        result = self.s.post(request, json=kwargs.get('json'), params=kwargs.get('params'), auth=auth)
-
-        result.raise_for_status()
-        return result
+        self._request('post', platform, request, **kwargs)
 
     def delete(self, platform, request, **kwargs):
-        auth = self._get_auth(platform)
+        self._request('delete', platform, request, **kwargs)
+
+    def _request(self, method, platform, request, **kwargs):
+        errors = {} if 'errors' not in kwargs else kwargs['errors']
+
         request = self._get_request(platform, request)
-        result = self.s.delete(request, params=kwargs.get('params'), auth=auth)
+        json, params, auth = kwargs.get('json'), kwargs.get('params'), self._get_auth(platform)
 
-        result.raise_for_status()
-        return result
+        data, response = None, None
 
-    def _get_rec(self, url, start, auth=None, **kwargs):
-        params = {
-            'start': start
-        }
-        params = {**kwargs.get('params', {}), **params}
-        r = self.s.get(url, params=params, json=kwargs.get('json'), auth=auth, headers={'Accept': 'application/json'})
-        if r.status_code == 200:
-            res = r.json()
-            if 'isLastPage' in res and not res['isLastPage']:
-                next_res = self._get_rec(url, res['nextPageStart'])
-                res['values'] += next_res['values']
-                res['size'] += next_res['size']
-            return res
+        if method == 'get':
+            response, data = self._get_rec(request, 0, params=params, auth=auth)
+        elif method == 'post':
+            response = self.s.post(request, json=json, params=params, auth=auth)
+        elif method == 'delete':
+            response = self.s.delete(request, json=json, params=params, auth=auth)
+
+        if response.status_code in errors.get('reasons', {}):
+            raise Exceptions.HTTPError(errors.get('message', 'Failure'),
+                                       errors.get('reasons', {}).get(response.status_code, 'unknown'),
+                                       response)
         else:
-            raise Exceptions.BadRequest
+            response.raise_for_status()
+
+        return data
+
+    def _get_rec(self, request, start, params=None, json=None, auth=None):
+        params = {**params, **{'start': start}}
+
+        response = self.s.get(request, params=params, json=json, auth=auth, headers={'Accept': 'application/json'})
+        if response.status_code == 200:
+            data = response.json()
+
+            is_last_page = data.get('isLastPage', True)
+            if not is_last_page:
+                next_res, next_data = self._get_rec(request, data['nextPageStart'])
+                data['values'] += next_data['values']
+                data['size'] += next_data['size']
+            return response, data
+        else:
+            return response, None
 
     def _get_request(self, platform, url):
         return os.path.join(self.roots[platform], self.api[platform], url)
