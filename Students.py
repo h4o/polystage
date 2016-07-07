@@ -18,14 +18,14 @@ class Student:
         return '{} {}'.format(self.firstname, self.lastname)
 
     def __str__(self):
-        return 'Yo ! My name is {}, i\'m a student of {}'.format(self.firstname, self.year)
+        return 'Yo ! My name is {}, i\'m a student of {}'.format(self.fullname, self.year)
 
     def get_crowd_format(self):
         user = {
             'name': self.unice_id,
             'first-name': self.firstname,
             'last-name': self.lastname,
-            'display-name': '{}'.format(self.firstname),
+            'display-name': '{}'.format(self.fullname),
             'email': self.unice_email,
             'password': {
                 'value': 'password'
@@ -46,12 +46,12 @@ def get_students(user_file):
 
 
 def get_registered_usernames():
-    students = req.get('crowd', 'search?entity-type=user')['users']
+    students = req.get('crowd', 'search', params={'entity-type': 'user'})['users']
     return [s['name'] for s in students]
 
 
 def get_groups():
-    groups = req.get('crowd', 'search?entity-type=group')['groups']
+    groups = req.get('crowd', 'search', params={'entity-type': 'group'})['groups']
     return [s['name'] for s in groups]
 
 

@@ -26,10 +26,9 @@ class Requester:
         if auth_jira.status_code != 200:
             raise Exceptions.CouldNotLog()
 
-    # TODO: allow KWARGS for params, json and so on
-    def get(self, platform, request):
+    def get(self, platform, request, **kwargs):
         request = self._get_request(platform, request)
-        return self._get_rec(request, 0, self._get_auth(platform))
+        return self._get_rec(request, 0, self._get_auth(platform), **kwargs)
 
     def post(self, platform, request, **kwargs):
         auth = self._get_auth(platform)
@@ -47,20 +46,19 @@ class Requester:
         result.raise_for_status()
         return result
 
-    def _get_rec(self, url, start, auth=None):
+    def _get_rec(self, url, start, auth=None, **kwargs):
         params = {
             'start': start
         }
-        r = self.s.get(url, params=params, auth=auth, headers={'Accept': 'application/json'})
+        params = {**kwargs.get('params', {}), **params}
+        r = self.s.get(url, params=params, json=kwargs.get('json'), auth=auth, headers={'Accept': 'application/json'})
         if r.status_code == 200:
             res = r.json()
-            if 'isLastPage' not in res or res['isLastPage']:
-                return res
-            else:
+            if 'isLastPage' in res and not res['isLastPage']:
                 next_res = self._get_rec(url, res['nextPageStart'])
                 res['values'] += next_res['values']
                 res['size'] += next_res['size']
-                return res
+            return res
         else:
             raise Exceptions.BadRequest
 
