@@ -13,7 +13,7 @@ def get_groups():
     params = {'entity-type': 'group'}
     try:
         return req.get('crowd', 'search', params=params, errors=errors)['groups']
-    except Exceptions.HTTPError as e:
+    except Exceptions.RequestException as e:
         eprint(e)
 
 
@@ -31,7 +31,7 @@ def create(groups):
             json = {'name': group, 'description': '', 'type': 'GROUP'}
             req.post('crowd', 'group', json=json, errors=errors)
             print('The group {} as been added'.format(group))
-        except Exceptions.HTTPError as e:
+        except Exceptions.RequestException as e:
             eprint(e)
 
 
@@ -46,5 +46,5 @@ def delete(groups):
         try:
             req.delete('crowd', 'group', params={'groupname': group}, errors=errors)
             print('The group {} has been deleted'.format(group))
-        except Exceptions.HTTPError as e:
+        except Exceptions.RequestException as e:
             eprint(e)

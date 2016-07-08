@@ -11,9 +11,9 @@ class BadCredentials(Exception):
         super(BadCredentials, self).__init__('Missing: {}'.format(tag))
 
 
-class HTTPError(Exception):
+class RequestException(Exception):
     def __init__(self, message, reason, response):
-        super(HTTPError, self).__init__(message, reason)
+        super(RequestException, self).__init__(message, reason)
         self.response = response
 
     @property

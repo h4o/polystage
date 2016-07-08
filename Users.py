@@ -39,7 +39,7 @@ def create(user):
     try:
         req.post('crowd', 'user', json=user.get_crowd_format(), errors=errors)
         print('The user {} has been registered'.format(user.display_name))
-    except Exceptions.HTTPError as e:
+    except Exceptions.RequestException as e:
         eprint(e)
 
 
@@ -59,7 +59,7 @@ def remove(user):
     try:
         req.delete('crowd', 'user', params={'username': user.username}, errors=errors)
         print('The user {} as been deleted'.format(user.display_name))
-    except Exceptions.HTTPError as e:
+    except Exceptions.RequestException as e:
         eprint(e)
 
 
@@ -86,7 +86,7 @@ def add_to_groups(user, groups, create=False):
         try:
             req.post('crowd', 'user/group/direct', params=params, json=json, errors=errors)
             print('The user {} has been added to the group {}'.format(user.display_name, group))
-        except Exceptions.HTTPError as e:
+        except Exceptions.RequestException as e:
             eprint(e)
 
 

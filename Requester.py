@@ -17,13 +17,7 @@ class Requester:
         cred = Credentials(cred_file)
         self.roots = cred['roots']
         self.crowd_auth = (cred['crowd']['app'], cred['crowd']['pwd'])
-        data = cred['credentials']
-
-        auth_url = os.path.join(self.roots['jira'], 'rest/auth/1/session/')
-        auth_jira = self.s.post(auth_url, json=data, verify=False)
-
-        if auth_jira.status_code != 200:
-            raise Exceptions.CouldNotLog()
+        self.jira_auth = (cred['credentials']['username'], cred['credentials']['password'])
 
     def get(self, platform, request, **kwargs):
         return self._request('get', platform, request, **kwargs)
@@ -50,22 +44,24 @@ class Requester:
             response = self.s.delete(request, json=json, params=params, auth=auth)
 
         if response.status_code in errors.get('reasons', {}):
-            raise Exceptions.HTTPError(errors.get('message', 'Failure'),
-                                       errors.get('reasons', {}).get(response.status_code, 'unknown'),
-                                       response)
+            raise Exceptions.RequestException(errors.get('message', 'Failure'),
+                                              errors.get('reasons', {}).get(response.status_code, 'unknown'),
+                                              response)
         else:
             response.raise_for_status()
 
         return data
 
     def _get_rec(self, request, start, params=None, json=None, auth=None):
+        params = {} if params is None else params
         params = {**params, **{'start': start}}
 
         response = self.s.get(request, params=params, json=json, auth=auth, headers={'Accept': 'application/json'})
         if response.status_code == 200:
             data = response.json()
-
-            is_last_page = data.get('isLastPage', True)
+            is_last_page = True
+            if not isinstance(data, list):
+                is_last_page = data.get('isLastPage', True)
             if not is_last_page:
                 next_res, next_data = self._get_rec(request, data['nextPageStart'])
                 data['values'] += next_data['values']
@@ -78,7 +74,7 @@ class Requester:
         return os.path.join(self.roots[platform], self.api[platform], url)
 
     def _get_auth(self, platform):
-        return self.crowd_auth if platform == 'crowd' else None
+        return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
 class Credentials:
