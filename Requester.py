@@ -23,10 +23,10 @@ class Requester:
         return self._request('get', platform, request, **kwargs)
 
     def post(self, platform, request, **kwargs):
-        self._request('post', platform, request, **kwargs)
+        return self._request('post', platform, request, **kwargs)
 
     def delete(self, platform, request, **kwargs):
-        self._request('delete', platform, request, **kwargs)
+        return self._request('delete', platform, request, **kwargs)
 
     def _request(self, method, platform, request, **kwargs):
         errors = {} if 'errors' not in kwargs else kwargs['errors']
@@ -40,8 +40,10 @@ class Requester:
             response, data = self._get_rec(request, 0, params=params, auth=auth)
         elif method == 'post':
             response = self.s.post(request, json=json, params=params, auth=auth)
+            data = response.json()
         elif method == 'delete':
             response = self.s.delete(request, json=json, params=params, auth=auth)
+            data = response.json()
 
         if response.status_code in errors.get('reasons', {}):
             raise Exceptions.RequestException(errors.get('message', 'Failure'),
