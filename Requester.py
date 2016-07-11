@@ -1,8 +1,9 @@
 import os
+
 import requests
-import yaml
 
 from exceptions import Exceptions
+from schema import yaml_loader
 
 
 class Requester:
@@ -14,7 +15,7 @@ class Requester:
 
     def __init__(self, cred_file='credentials.yml'):
         self.s = requests.Session()
-        cred = Credentials(cred_file)
+        cred = yaml_loader.load(cred_file, 'schema/credential_schema.yml')
         self.roots = cred['roots']
         self.crowd_auth = (cred['crowd']['app'], cred['crowd']['pwd'])
         self.jira_auth = (cred['credentials']['username'], cred['credentials']['password'])
@@ -77,37 +78,6 @@ class Requester:
 
     def _get_auth(self, platform):
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
-
-
-class Credentials:
-    mandatory_tags = {
-        'roots': ['jira', 'stash', 'crowd'],
-        'credentials': ['username', 'password'],
-        'crowd': ['app', 'pwd'],
-    }
-
-    def __init__(self, file='credentials_poly.yaml'):
-        with open(file) as f:
-            self.cred = yaml.safe_load(f)
-
-            # Checks if credential file structure is respected
-            tag = self._missing_tag(self.cred, Credentials.mandatory_tags)
-            if tag is not None:
-                raise Exceptions.BadCredentials(tag)
-
-            for node in self.cred:
-                tag = self._missing_tag(self.cred[node], Credentials.mandatory_tags[node])
-                if tag is not None:
-                    raise Exceptions.BadCredentials('node: ' + tag)
-
-    def __getitem__(self, index):
-        return self.cred[index]
-
-    def _missing_tag(self, dictionary, mandatory_tags):
-        for tag in mandatory_tags:
-            if tag not in dictionary:
-                return tag
-        return None
 
 
 req = Requester()

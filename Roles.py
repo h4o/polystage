@@ -18,13 +18,13 @@ def create(role_name, description=''):
         eprint(e)
 
 
-def get(name):
+def get(role_name):
     roles = get_all()
     if roles is None:
         return None
     match = None
     for role in roles:
-        if role['name'] == name:
+        if role['name'] == role_name:
             match = role
             break
     return match
