@@ -41,3 +41,21 @@ def get_all():
         return req.get('jira', 'role', errors=errors)
     except Exceptions.RequestException as e:
         eprint(e)
+
+
+def delete(role_name):
+    role = get(role_name)
+    role_id = None if role is None else role['id']
+    errors = {
+        'message': 'Could not delete role',
+        'reasons': {
+            404: 'Given id does not exist',
+            409: 'Project role is used in schemes and roleToSwap query parameter is not given'
+        }
+    }
+    try:
+        response = req.delete('jira', 'role/{}'.format(role_id), errors=errors)
+        print('The group has been deleted')
+        return response
+    except Exceptions.RequestException as e:
+        eprint(e)

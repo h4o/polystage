@@ -42,22 +42,24 @@ class Requester:
             response, data = self._get_rec(request, 0, params=params, auth=auth)
         elif method == 'post':
             response = self.s.post(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
-
         elif method == 'delete':
-            response = self.s.delete(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
+            response = self.s.delete(request, json=json, params=params, auth=auth,
+                                     headers={'Accept': 'application/json'})
 
         try:
             data = data or response.json()
         except ValueError as e:
             pass
 
-        if response.status_code in errors.get('reasons', {}):
-            raise Exceptions.RequestException(errors.get('message', 'Failure'),
-                                              errors.get('reasons', {}).get(response.status_code, 'unknown'),
-                                              response)
-        else:
+        try:
             response.raise_for_status()
-
+        except requests.HTTPError as e:
+            if response.status_code in errors.get('reasons', {}):
+                raise Exceptions.RequestException(errors.get('message', 'Failure'),
+                                                  errors.get('reasons', {}).get(response.status_code, 'unknown'),
+                                                  response)
+            else:
+                raise Exceptions.RequestException('Failure', e, response)
         return data
 
     def _get_rec(self, request, start, params=None, json=None, auth=None):
@@ -85,4 +87,5 @@ class Requester:
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
+# req = Requester('cred_server.yml')
 req = Requester()

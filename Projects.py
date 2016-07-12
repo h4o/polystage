@@ -1,5 +1,3 @@
-import yaml
-
 import Roles
 from Requester import req
 from exceptions import Exceptions
@@ -7,39 +5,31 @@ from schema import yaml_loader
 from util import eprint
 
 
-def import_projects(file, create_roles=False):
-    p = yaml_loader.load('schema/project_sample.yml', 'schema/project_schema.yml')
+def import_projects(file_path):
+    p = yaml_loader.load(file_path, 'schema/project_schema.yml')
+    params = p['global']
+    projects = p['projects']
 
-    for project in p['projects']:
-        print("Trying to delete : " + project['key'])
-        delete(project['key'])
-
-    for project in p['projects']:
-        lead = project.get('lead', project['developers'][0])
-        create(project['key'], project['name'], lead)
-    #
-    # project = p['projects'][0]
-    # lead = project.get('lead', project['developers'][0])
-    # # delete(project['key'])
-    # create(project['key'], project['name'], lead)
+    for project in projects:
+        _import_project(project, params)
 
 
-def _import_project(project, create_roles=False):
-    params = project['parameters']
-    members = project['members']
-    roles = members.keys()
+def _import_project(project, params):
+    project_type = params.get('type', 'business')
+    key = project.get('key') or project['name'][:10].replace(' ', '').upper()
 
-    create(params['key'], params['name'], params['lead'], params.get('description', ''))
+    create(key, project['name'], project['lead'], project_type=project_type)
 
-    for role_name in roles:
-        role = Roles.get(role_name)
-        if role is None and create_roles:
-            role = Roles.create(role_name)
-        for member in members[role_name]:
-            add_to_role(params['key'], member, role.get('id', None))
+    dev_role = Roles.get('developers') or Roles.create('developers', 'The developers of the project')
+    sup_role = Roles.get('supervisors') or Roles.create('supervisors', 'The supervisors of the project')
+
+    for dev in project['developers']:
+        add_with_role(key, dev, dev_role['id'])
+    for sup in project.get('supervisors', []):
+        add_with_role(key, sup, sup_role['id'])
 
 
-def add_to_role(project_key, user, role_id):
+def add_with_role(project_key, user, role_id):
     errors = {
         'message': 'Could not add user {} to the project {} for the role {}'.format(user, project_key, role_id),
         'reasons': {
@@ -53,11 +43,14 @@ def add_to_role(project_key, user, role_id):
         eprint(e)
 
 
-def create(key, name, lead, description=''):
+def create(key, name, lead, description='', project_type='business'):
+    """
+    The key must be in uppercase, and its length in [2:10]
+    """
     project = {
         'key': key,
         'name': name,
-        'projectTypeKey': 'business',
+        'projectTypeKey': project_type,
         'description': description,
         'lead': lead
     }
@@ -90,5 +83,21 @@ def delete(key):
         eprint(e)
 
 
-if __name__ == '__main__':
-    import_projects('projects.yml', True)
+def get(key):
+    errors = {
+        'message': 'Could not get project {}'.format(key),
+        'reasons': {
+            404: 'Project not found'
+        }
+    }
+    try:
+        return req.get('jira', 'project/{}'.format(key), errors=errors)
+    except Exceptions.RequestException as e:
+        eprint(e)
+
+
+def get_all():
+    try:
+        return req.get('jira', 'project')
+    except Exceptions.RequestException as e:
+        eprint(e)

@@ -1,18 +1,11 @@
-tag: ISLAND
-type: business
-admin: mosser
+global:
+  tag: ISLAND
+  type: business
+  admin: mosser
 projects:
-  - name: ISLAA
-    key: ISLAA
-    lead: ln404361
+  - name: Dam dam deo
+    lead: mosser
     developers:
       - ln404361
-    supervisors:
-      - collet
-  - name: ISLBD
-    key: ISLBD
-    developers:
-      - colet
-      - ln404361
-    supervisors:
-      - collet
+      - vf200724
+      - mosser

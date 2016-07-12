@@ -1,0 +1,12 @@
+roots:
+  stash: ''
+  jira: http://134.59.130.155/jira/
+  crowd: http://134.59.130.155/crowd/
+
+credentials:
+  username: mosser
+  password: admin
+
+crowd:
+  app: polyproject
+  pwd: admin
