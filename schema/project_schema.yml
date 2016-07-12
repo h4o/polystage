@@ -1,0 +1,17 @@
+type: //rec
+required: 
+  tag: //str
+  admin: //str
+  projects:
+    type: //arr
+    contents:
+      type: //rec
+      required:
+        name: //str
+        key: //str
+        developers: {type: //arr, contents: //str}
+      optional:
+        lead: //str
+        supervisors: {type: //arr, contents: //str}
+optional:
+  type: //str

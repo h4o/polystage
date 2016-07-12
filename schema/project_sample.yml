@@ -1,0 +1,18 @@
+tag: ISLAND
+type: business
+admin: mosser
+projects:
+  - name: ISLAA
+    key: ISLAA
+    lead: ln404361
+    developers:
+      - ln404361
+    supervisors:
+      - collet
+  - name: ISLBD
+    key: ISLBD
+    developers:
+      - colet
+      - ln404361
+    supervisors:
+      - collet

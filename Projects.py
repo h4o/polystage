@@ -3,14 +3,25 @@ import yaml
 import Roles
 from Requester import req
 from exceptions import Exceptions
+from schema import yaml_loader
 from util import eprint
 
 
 def import_projects(file, create_roles=False):
-    with open(file) as f:
-        projects = yaml.safe_load(f)
-        for project in projects:
-            _import_project(project, create_roles)
+    p = yaml_loader.load('schema/project_sample.yml', 'schema/project_schema.yml')
+
+    for project in p['projects']:
+        print("Trying to delete : " + project['key'])
+        delete(project['key'])
+
+    for project in p['projects']:
+        lead = project.get('lead', project['developers'][0])
+        create(project['key'], project['name'], lead)
+    #
+    # project = p['projects'][0]
+    # lead = project.get('lead', project['developers'][0])
+    # # delete(project['key'])
+    # create(project['key'], project['name'], lead)
 
 
 def _import_project(project, create_roles=False):
@@ -53,7 +64,7 @@ def create(key, name, lead, description=''):
     errors = {
         'message': 'Could not create project {}'.format(name),
         'reasons': {
-            400: 'Invalid request. Arguments missing or the project already exists'
+            400: 'Invalid request. Leader unknown or the project already exists'
         }
     }
     try:

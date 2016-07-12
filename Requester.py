@@ -4,6 +4,7 @@ import requests
 
 from exceptions import Exceptions
 from schema import yaml_loader
+from util import eprint
 
 
 class Requester:
@@ -40,11 +41,15 @@ class Requester:
         if method == 'get':
             response, data = self._get_rec(request, 0, params=params, auth=auth)
         elif method == 'post':
-            response = self.s.post(request, json=json, params=params, auth=auth)
-            data = response.json()
+            response = self.s.post(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
+
         elif method == 'delete':
-            response = self.s.delete(request, json=json, params=params, auth=auth)
-            data = response.json()
+            response = self.s.delete(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
+
+        try:
+            data = data or response.json()
+        except ValueError as e:
+            pass
 
         if response.status_code in errors.get('reasons', {}):
             raise Exceptions.RequestException(errors.get('message', 'Failure'),
