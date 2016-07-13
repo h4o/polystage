@@ -4,13 +4,13 @@ import requests
 
 from exceptions import Exceptions
 from schema import yaml_loader
-from util import eprint
 
 
 class Requester:
     api = {
         'jira': 'rest/api/2/',
         'stash': 'rest/api/1.0/',
+        'applinks': 'rest/applinks/1.0/',
         'crowd': 'rest/usermanagement/1/'
     }
 
@@ -18,6 +18,7 @@ class Requester:
         self.s = requests.Session()
         cred = yaml_loader.load(cred_file, 'schema/credential_schema.yml')
         self.roots = cred['roots']
+        self.roots['applinks'] = self.roots['jira']
         self.crowd_auth = (cred['crowd']['app'], cred['crowd']['pwd'])
         self.jira_auth = (cred['credentials']['username'], cred['credentials']['password'])
 
@@ -26,6 +27,9 @@ class Requester:
 
     def post(self, platform, request, **kwargs):
         return self._request('post', platform, request, **kwargs)
+
+    def put(self, platform, request, **kwargs):
+        return self._request('put', platform, request, **kwargs)
 
     def delete(self, platform, request, **kwargs):
         return self._request('delete', platform, request, **kwargs)
@@ -36,37 +40,39 @@ class Requester:
         request = self._get_request(platform, request)
         json, params, auth = kwargs.get('json'), kwargs.get('params'), self._get_auth(platform)
 
-        data, response = None, None
+        data, resp = None, None
 
         if method == 'get':
-            response, data = self._get_rec(request, 0, params=params, auth=auth)
+            resp, data = self._get_rec(request, 0, params=params, auth=auth, headers={'Accept': 'application/json'})
         elif method == 'post':
-            response = self.s.post(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
+            resp = self.s.post(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
+        elif method == 'put':
+            resp = self.s.put(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
         elif method == 'delete':
-            response = self.s.delete(request, json=json, params=params, auth=auth,
-                                     headers={'Accept': 'application/json'})
+            resp = self.s.delete(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
 
         try:
-            data = data or response.json()
+            data = data or resp.json()
         except ValueError as e:
             pass
 
         try:
-            response.raise_for_status()
+            resp.raise_for_status()
         except requests.HTTPError as e:
-            if response.status_code in errors.get('reasons', {}):
+            if resp.status_code in errors.get('reasons', {}):
                 raise Exceptions.RequestException(errors.get('message', 'Failure'),
-                                                  errors.get('reasons', {}).get(response.status_code, 'unknown'),
-                                                  response)
+                                                  errors.get('reasons', {}).get(resp.status_code, 'unknown'),
+                                                  resp)
             else:
-                raise Exceptions.RequestException('Failure', e, response)
+                raise Exceptions.RequestException('Failure', e, resp)
         return data
 
-    def _get_rec(self, request, start, params=None, json=None, auth=None):
+    def _get_rec(self, request, start, params=None, json=None, auth=None, headers=None):
         params = {} if params is None else params
         params = {**params, **{'start': start}}
 
-        response = self.s.get(request, params=params, json=json, auth=auth, headers={'Accept': 'application/json'})
+        response = self.s.get(request, params=params, json=json, auth=auth, verify=False,
+                              headers=headers)
         if response.status_code == 200:
             data = response.json()
             is_last_page = True
@@ -87,5 +93,5 @@ class Requester:
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
-# req = Requester('cred_server.yml')
-req = Requester()
+req = Requester('cred_server.yml')
+# req = Requester()

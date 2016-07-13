@@ -1,3 +1,5 @@
+# from Tkinter import Tk
+from Requester import req
 import json
 
 import Groups
@@ -12,11 +14,31 @@ import Users
 
 # Projects.create('GL', 'Le gang des lover', 'mosser')
 # Projects.import_projects('schema/project_sample.yml')
-from Requester import req
 
-r = req.get('jira', 'permissionscheme/{}'.format(10000))
-print(r)
-print(json.dumps(r))
+# r = req.get('jira', 'permissionscheme/{}'.format(10000))
+
+# key = 'TRUANDS'
+# name = 'Les truands d\'la brosse à dent'
+# Projects.delete_bitbucket(key)
+# r = Projects.create_bitbucket(key, name)
+
+import Applinks
+name = "TOTOLAJOIE"
+Projects.create_bitbucket(name, name)
+Projects.create_jira(name, name, 'mosser')
+
+Applinks.link(name, name)
+# print(json.dumps(r))
+#
+# pjira = 'BB'
+
+
+# req.delete('stash', 'repositories/mosser/BB/')
+# r = req.get('stash', 'repositories/mosser/BB/links')
+# r = req.get('stash', 'repods')['values']
+
+# print(r)
+
 # print(r['permissions'][0]['holder'])
 # for a in r['permissions']:
 #     print(a['permission'], '=>', a['holder'])

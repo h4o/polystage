@@ -18,7 +18,8 @@ def _import_project(project, params):
     project_type = params.get('type', 'business')
     key = project.get('key') or project['name'][:10].replace(' ', '').upper()
 
-    create(key, project['name'], project['lead'], project_type=project_type)
+    create_jira(key, project['name'], project['lead'], project_type=project_type)
+    create_bitbucket(key, project['name'])
 
     dev_role = Roles.get('developers') or Roles.create('developers', 'The developers of the project')
     sup_role = Roles.get('supervisors') or Roles.create('supervisors', 'The supervisors of the project')
@@ -43,9 +44,9 @@ def add_with_role(project_key, user, role_id):
         eprint(e)
 
 
-def create(key, name, lead, description='', project_type='business'):
+def create_jira(key, name, lead, description='', project_type='business'):
     """
-    The key must be in uppercase, and its length in [2:10]
+    The key must be in uppercase, and its length in [2,10]
     """
     project = {
         'key': key,
@@ -55,7 +56,7 @@ def create(key, name, lead, description='', project_type='business'):
         'lead': lead
     }
     errors = {
-        'message': 'Could not create project {}'.format(name),
+        'message': 'Could not create jira project {}'.format(name),
         'reasons': {
             400: 'Invalid request. Leader unknown or the project already exists'
         }
@@ -68,9 +69,29 @@ def create(key, name, lead, description='', project_type='business'):
         eprint(e)
 
 
-def delete(key):
+def create_bitbucket(key, name, description=''):
+    project = {
+        'key': key,
+        'name': name,
+        'description': description
+    }
     errors = {
-        'message': 'Could not delete project {}'.format(key),
+        'message': 'Could not create bitbucket project {}'.format(name),
+        'reasons': {
+            400: 'Validation error',
+            409: 'The project key or name is already in use'
+        }
+    }
+    try:
+        req.post('stash', 'projects', json=project, errors=errors)
+        print('The bitbucket project {} has been created'.format(name))
+    except Exceptions.RequestException as e:
+        eprint(e)
+
+
+def delete_jira(key):
+    errors = {
+        'message': 'Could not delete jira project {}'.format(key),
         'reasons': {
             403: 'You do not have the permissions to delete the project',
             404: 'The project does not exist'
@@ -78,12 +99,28 @@ def delete(key):
     }
     try:
         req.delete('jira', 'project/{}'.format(key), errors=errors)
-        print('The project {} has been deleted'.format(key))
+        print('The jira project {} has been deleted'.format(key))
     except Exceptions.RequestException as e:
         eprint(e)
 
 
-def get(key):
+def delete_bitbucket(key, delete_repositories=False):
+    errors = {
+        'message': 'Could not delete bitbucket project {}'.format(key),
+        'reasons': {
+            403: 'You do not have the permissions to delete the project',
+            404: 'The project does not exist',
+            409: 'The project can not be deleted as it contains repositories',
+        }
+    }
+    try:
+        req.delete('stash', 'projects/{}'.format(key), errors=errors)
+        print('The bitbucket project {} has been deleted'.format(key))
+    except Exceptions.RequestException as e:
+        eprint(e)
+
+
+def get_jira(key):
     errors = {
         'message': 'Could not get project {}'.format(key),
         'reasons': {
@@ -96,7 +133,7 @@ def get(key):
         eprint(e)
 
 
-def get_all():
+def get_all_jira():
     try:
         return req.get('jira', 'project')
     except Exceptions.RequestException as e:

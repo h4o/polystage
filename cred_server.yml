@@ -1,5 +1,5 @@
 roots:
-  stash: ''
+  stash: http://134.59.130.155/bitbucket/
   jira: http://134.59.130.155/jira/
   crowd: http://134.59.130.155/crowd/
 
