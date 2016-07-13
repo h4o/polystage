@@ -70,7 +70,7 @@ def remove_many(users):
 
 def add_to_groups(user, groups, create=False):
     if create:
-        Groups.create(groups)
+        Groups.create_jira(groups)
     for group in groups:
         errors = {
             'message': 'Could not add {} to group {}'.format(user.display_name, group),
@@ -92,6 +92,6 @@ def add_to_groups(user, groups, create=False):
 
 def add_many_to_groups(users, groups, create=False):
     if create:
-        Groups.create(groups)
+        Groups.create_jira(groups)
     for user in users:
         add_to_groups(user, groups)

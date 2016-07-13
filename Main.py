@@ -1,4 +1,4 @@
-# from Tkinter import Tk
+import Applinks
 from Requester import req
 import json
 
@@ -9,11 +9,11 @@ import Users
 
 # Groups.delete(['4a-2015'])
 # Users.remove_students('students.csv')
-# Users.import_students('students.csv', ['jira-software-users', 'Les zouzous du dimanche'], create_groups=True)
+# Users.import_students('students.csv', ['jira-software-users'], create_groups=True)
 # Users.import_students('students.csv', ['jira-users', 'Les zouzous du dimanche'], create_groups=True)
 
 # Projects.create('GL', 'Le gang des lover', 'mosser')
-# Projects.import_projects('schema/project_sample.yml')
+Projects.import_projects('schema/project_sample.yml')
 
 # r = req.get('jira', 'permissionscheme/{}'.format(10000))
 
@@ -22,12 +22,6 @@ import Users
 # Projects.delete_bitbucket(key)
 # r = Projects.create_bitbucket(key, name)
 
-import Applinks
-name = "TOTOLAJOIE"
-Projects.create_bitbucket(name, name)
-Projects.create_jira(name, name, 'mosser')
-
-Applinks.link(name, name)
 # print(json.dumps(r))
 #
 # pjira = 'BB'

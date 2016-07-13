@@ -17,7 +17,7 @@ def get_groups():
         eprint(e)
 
 
-def create(groups):
+def create_jira(groups):
     for group in groups:
         errors = {
             'message': 'Could not create group {}'.format(group),
@@ -35,16 +35,15 @@ def create(groups):
             eprint(e)
 
 
-def delete(groups):
-    for group in groups:
-        errors = {
-            'message': 'Could not delete group {}'.format(group),
-            'reasons': {
-                404: 'The group could not be found'
-            }
+def delete_jira(group):
+    errors = {
+        'message': 'Could not delete group {}'.format(group),
+        'reasons': {
+            404: 'The group could not be found'
         }
-        try:
-            req.delete('crowd', 'group', params={'groupname': group}, errors=errors)
-            print('The group {} has been deleted'.format(group))
-        except Exceptions.RequestException as e:
-            eprint(e)
+    }
+    try:
+        req.delete('crowd', 'group', params={'groupname': group}, errors=errors)
+        print('The group {} has been deleted'.format(group))
+    except Exceptions.RequestException as e:
+        eprint(e)

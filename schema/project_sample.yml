@@ -2,8 +2,12 @@ global:
   tag: ISLAND
   type: business
   admin: mosser
+  repositories:
+    - YoloOne
+    - Salameche
+    - YoloTwo
 projects:
-  - name: Dam dam deo
+  - name: Lettre F
     lead: mosser
     developers:
       - ln404361

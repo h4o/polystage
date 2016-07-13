@@ -5,6 +5,7 @@ required:
     required:
       tag: //str
       admin: //str
+      repositories: {type: //arr, contents: //str}
     optional:
       type: //str
 
@@ -19,3 +20,4 @@ required:
         lead: //str
         key: //str
         supervisors: {type: //arr, contents: //str}
+

@@ -1,3 +1,5 @@
+import Applinks
+import Repos
 import Roles
 from Requester import req
 from exceptions import Exceptions
@@ -24,10 +26,17 @@ def _import_project(project, params):
     dev_role = Roles.get('developers') or Roles.create('developers', 'The developers of the project')
     sup_role = Roles.get('supervisors') or Roles.create('supervisors', 'The supervisors of the project')
 
+    Applinks.link(key, key)
+
     for dev in project['developers']:
         add_with_role(key, dev, dev_role['id'])
     for sup in project.get('supervisors', []):
         add_with_role(key, sup, sup_role['id'])
+
+    repos = params.get('repositories', None)
+    if repos is not None:
+        for repo in repos:
+            Repos.create(key, repo)
 
 
 def add_with_role(project_key, user, role_id):
@@ -83,8 +92,9 @@ def create_bitbucket(key, name, description=''):
         }
     }
     try:
-        req.post('stash', 'projects', json=project, errors=errors)
+        response = req.post('stash', 'projects', json=project, errors=errors)
         print('The bitbucket project {} has been created'.format(name))
+        return response
     except Exceptions.RequestException as e:
         eprint(e)
 
