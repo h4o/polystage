@@ -1,4 +1,5 @@
 import Applinks
+import Permissions
 import Repos
 import Roles
 from Requester import req
@@ -12,8 +13,13 @@ def import_projects(file_path):
     params = p['global']
     projects = p['projects']
 
+    Permissions.create(params['tag'])
+
     for project in projects:
         _import_project(project, params)
+
+    Permissions.create_permission(params['tag'], 'projectRole', 'developers', 'BROWSE_PROJECTS')
+    Permissions.create_permission(params['tag'], 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS')
 
 
 def _import_project(project, params):
@@ -37,6 +43,8 @@ def _import_project(project, params):
     if repos is not None:
         for repo in repos:
             Repos.create(key, repo)
+
+    Permissions.assign_to_project(key, params['tag'])
 
 
 def add_with_role(project_key, user, role_id):

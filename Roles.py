@@ -19,9 +19,7 @@ def create(role_name, description=''):
 
 
 def get(role_name):
-    roles = get_all()
-    if roles is None:
-        return None
+    roles = get_all() or []
     match = None
     for role in roles:
         if role['name'] == role_name:

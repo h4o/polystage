@@ -1,15 +1,15 @@
 global:
-  tag: ISLAND
+  tag: TRUELASTONE
   type: business
   admin: mosser
   repositories:
     - YoloOne
-    - Salameche
-    - YoloTwo
 projects:
-  - name: Lettre F
+  - name: ZAZAKEKEKE
     lead: mosser
     developers:
       - ln404361
       - vf200724
+      - mosser
+    supervisors:
       - mosser
