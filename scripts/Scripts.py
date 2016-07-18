@@ -37,12 +37,17 @@ def import_projects(file_path):
         _import_project(project, params)
 
     Permissions.create_permission(params['tag'], 'projectRole', 'developers', 'BROWSE_PROJECTS')
+    Permissions.create_permission(params['tag'], 'projectRole', 'supervisors', 'BROWSE_PROJECTS')
     Permissions.create_permission(params['tag'], 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS')
+
+
+def _name_to_key(name):
+    return name[:10].replace(' ', '').upper()
 
 
 def _import_project(project, params):
     project_type = params.get('type', 'business')
-    key = project.get('key') or project['name'][:10].replace(' ', '').upper()
+    key = project.get('key') or _name_to_key(project['name'])
 
     Projects.create_jira(key, project['name'], project['lead'], project_type=project_type)
     Projects.create_bitbucket(key, project['name'])
@@ -64,3 +69,41 @@ def _import_project(project, params):
             Repos.create(key, repo)
 
     Permissions.assign_to_project(key, params['tag'])
+
+
+def import_multi_repo(multi_repo_file):
+    projects = yaml_loader.load(multi_repo_file, 'schema/multi_repo_schema.yml')
+    params, repos = projects['global'], projects['repositories']
+    params['key'] = params.get('key') or _name_to_key(params['name'])
+    params['applink'] = params.get('applink', False)
+    params['type'] = params.get('type', 'business')
+
+    Projects.create_jira(params['key'], params['name'], params['admin'], project_type=params['type'])
+    Projects.create_bitbucket(params['key'], params['name'])
+
+    Roles.get('developers') or Roles.create('developers', '')
+    Roles.get('supervisors') or Roles.create('supervisors', '')
+
+    Projects.add_with_role(params['key'], params['admin'], 'supervisors')
+    for supervisor in params['supervisors']:
+        Projects.add_with_role(params['key'], supervisor, 'supervisors')
+    developers = set.union(*[set(r['developers']) for r in repos])
+    for dev in developers:
+        Projects.add_with_role(params['key'], dev, 'developers')
+
+    Permissions.create(params['name'])
+    Permissions.assign_to_project(params['key'], params['name'])
+    Permissions.create_permission(params['name'], 'projectRole', 'developers', 'BROWSE_PROJECTS')
+    Permissions.create_permission(params['name'], 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS')
+    Permissions.create_permission(params['name'], 'projectRole', 'supervisors', 'BROWSE_PROJECTS')
+
+    if params['applink']:
+        Applinks.link(params['key'], params['key'])
+
+    for repo in repos:
+        _create_set_repo(repo, params)
+
+
+def _create_set_repo(repo, params):
+    Repos.create(params['key'], repo['name'])
+    # TODO set permissions

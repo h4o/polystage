@@ -1,0 +1,16 @@
+global:
+  name: Devint
+  # key: # a key could be set here
+  # applink: # link between the project and the repos. False by default
+  # type: # default :
+  admin: mosser
+  supervisors:
+    - aj404161
+repositories:
+  - name: Bang bang
+    developers:
+      - vf200724
+      - ln404361
+  - name: Memory
+    developers:
+      - aj404161

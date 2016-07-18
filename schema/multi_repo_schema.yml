@@ -1,0 +1,24 @@
+# Template for a single project with several repositories
+
+type: //rec
+required:
+  global:
+    type: //rec
+    required:
+      name: //str
+      admin: //str
+      supervisors: {type: //arr, contents: //str}
+    optional:
+      applink: //bool # default is false
+      type: //str
+#     If the key is not set, default value is an uppercase and space-stripped version of the name
+      key: //str
+
+  repositories:
+    type: //arr
+    contents:
+      type: //rec
+      required:
+        name: //str
+        developers: {type: //arr, contents: //str}
+
