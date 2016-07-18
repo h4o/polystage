@@ -1,7 +1,7 @@
 import re
-from six import string_types  # for 2-3 compatibility
-import types
 from numbers import Number
+
+from six import string_types  # for 2-3 compatibility
 
 core_types = []
 

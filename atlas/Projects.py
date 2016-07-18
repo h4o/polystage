@@ -1,18 +1,21 @@
+from atlas import Roles
 from exceptions import Exceptions
 from requester.Requester import req
 from util import eprint
 
 
-def add_with_role(project_key, user, role_id):
+def add_with_role(project_key, user, role_name):
+    role = Roles.get(role_name) or {}
+    role_id = role.get('id', None)
     errors = {
-        'message': 'Could not add user {} to the project {} for the role {}'.format(user, project_key, role_id),
+        'message': 'Could not add user {} to the project {} for the role {}'.format(user, project_key, role_name),
         'reasons': {
             404: 'Either the group, the role or the project does not exist or the user is already in it'
         }
     }
     try:
         req.post('jira', 'project/{}/role/{}'.format(project_key, role_id), json={'user': [user]}, errors=errors)
-        print('The user {} has been added to the project {} for the role {}'.format(user, project_key, role_id))
+        print('The user {} has been added to the project {} for the role {}'.format(user, project_key, role_name))
     except Exceptions.RequestException as e:
         eprint(e)
 
@@ -95,6 +98,7 @@ def delete_bitbucket(key, delete_repositories=False):
 
 
 def get_jira(key):
+    key = key.upper()
     errors = {
         'message': 'Could not get project {}'.format(key),
         'reasons': {
@@ -103,6 +107,20 @@ def get_jira(key):
     }
     try:
         return req.get('jira', 'project/{}'.format(key), errors=errors)
+    except Exceptions.RequestException as e:
+        eprint(e)
+
+
+def get_bitbucket(key):
+    key = key.upper()
+    errors = {
+        'message': 'Could not get project {}'.format(key),
+        'reasons': {
+            404: 'Project not found'
+        }
+    }
+    try:
+        return req.get('stash', 'projects/{}'.format(key), errors=errors)
     except Exceptions.RequestException as e:
         eprint(e)
 

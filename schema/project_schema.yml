@@ -5,9 +5,10 @@ required:
     required:
       tag: //str
       admin: //str
-      repositories: {type: //arr, contents: //str}
+      repositories: {type: //arr, contents: //str, length: {min: 1}}
     optional:
       type: //str
+      applink: //bool
 
   projects:
     type: //arr

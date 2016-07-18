@@ -1,15 +1,16 @@
 global:
-  tag: Ptitag
+  tag: Lion
   type: business
   admin: mosser
+  applink: true
   repositories:
-    - Ptirepo
+    - Chat
 projects:
-  - name: Ptiprojet
-    lead: mosser
+  - name: Chien
+    lead: ln404361
     developers:
       - ln404361
       - vf200724
-      - mosser
+      - aj404161
     supervisors:
-      - mosser
+      - aj404161

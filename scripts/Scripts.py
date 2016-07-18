@@ -50,12 +50,13 @@ def _import_project(project, params):
     dev_role = Roles.get('developers') or Roles.create('developers', 'The developers of the project')
     sup_role = Roles.get('supervisors') or Roles.create('supervisors', 'The supervisors of the project')
 
-    Applinks.link(key, key)
+    if params.get('applink', True):
+        Applinks.link(key, key)
 
     for dev in project['developers']:
-        Projects.add_with_role(key, dev, dev_role['id'])
+        Projects.add_with_role(key, dev, dev_role['name'])
     for sup in project.get('supervisors', []):
-        Projects.add_with_role(key, sup, sup_role['id'])
+        Projects.add_with_role(key, sup, sup_role['name'])
 
     repos = params.get('repositories', None)
     if repos is not None:
