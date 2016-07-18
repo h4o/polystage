@@ -1,6 +1,3 @@
-import csv
-
-
 class User:
     def __init__(self, firstname, lastname, email):
         self.firstname = firstname

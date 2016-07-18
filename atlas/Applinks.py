@@ -1,6 +1,5 @@
-from requester.Requester import req
-
 from exceptions import Exceptions
+from requester.Requester import req
 from util import eprint
 
 

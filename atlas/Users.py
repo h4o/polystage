@@ -1,31 +1,7 @@
-import csv
-
-from requester.Requester import req
 from atlas import Groups
-from atlas.User import Student
 from exceptions import Exceptions
+from requester.Requester import req
 from util import eprint
-
-
-def load_students(user_file):
-    users = []
-    with open(user_file) as f:
-        users_csv = csv.reader(f, delimiter=';')
-        for row in users_csv:
-            user = Student(row)
-            users.append(user)
-    return users
-
-
-def import_students(user_file, groups, create_groups=False):
-    students = load_students(user_file)
-    create_many(students)
-    add_many_to_groups(students, groups, create_groups)
-
-
-def remove_students(user_file):
-    students = load_students(user_file)
-    remove_many(students)
 
 
 def create(user):
