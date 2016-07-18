@@ -1,8 +1,9 @@
-import Applinks
-import Permissions
-import Repos
-import Roles
-from Requester import req
+from atlas import Repos
+from atlas import Roles
+
+from atlas import Applinks
+from requester.Requester import req
+from atlas import Permissions
 from exceptions import Exceptions
 from schema import yaml_loader
 from util import eprint

@@ -1,11 +1,4 @@
-import Applinks
-from Requester import req
-import json
-
-import Groups
-import Projects
-import Roles
-import Users
+from atlas import Projects
 
 # Groups.delete(['4a-2015'])
 # Users.remove_students('students.csv')

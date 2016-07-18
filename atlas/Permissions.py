@@ -1,7 +1,5 @@
-import json
-
-import Roles
-from Requester import req
+from requester.Requester import req
+from atlas import Roles
 from exceptions import Exceptions
 from util import eprint
 

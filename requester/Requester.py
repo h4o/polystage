@@ -14,7 +14,7 @@ class Requester:
         'crowd': 'rest/usermanagement/1/'
     }
 
-    def __init__(self, cred_file='credentials.yml'):
+    def __init__(self, cred_file='requester/credentials.yml'):
         self.s = requests.Session()
         cred = yaml_loader.load(cred_file, 'schema/credential_schema.yml')
         self.roots = cred['roots']
@@ -93,5 +93,5 @@ class Requester:
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
-req = Requester('cred_server.yml')
+req = Requester('requester/cred_server.yml')
 # req = Requester()

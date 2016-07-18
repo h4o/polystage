@@ -1,11 +1,11 @@
 global:
-  tag: TRUELASTONE
+  tag: Ptitag
   type: business
   admin: mosser
   repositories:
-    - YoloOne
+    - Ptirepo
 projects:
-  - name: ZAZAKEKEKE
+  - name: Ptiprojet
     lead: mosser
     developers:
       - ln404361

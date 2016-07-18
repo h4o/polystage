@@ -1,8 +1,8 @@
 import csv
 
-import Groups
-from Requester import req
-from User import Student
+from requester.Requester import req
+from atlas import Groups
+from atlas.User import Student
 from exceptions import Exceptions
 from util import eprint
 
