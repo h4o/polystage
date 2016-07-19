@@ -1,9 +1,10 @@
 from atlas import Groups
 from exceptions import Exceptions
-from requester.Requester import req
+from requester.Requester import req, rest_request
 from util import eprint
 
 
+@rest_request
 def create(user):
     errors = {
         'message': 'Could not register {}'.format(user.fullname),
@@ -12,18 +13,18 @@ def create(user):
             403: 'The application is not allowed to create a new user'
         }
     }
-    try:
-        req.post('crowd', 'user', json=user.get_crowd_format(), errors=errors)
-        print('The user {} has been registered'.format(user.display_name))
-    except Exceptions.RequestException as e:
-        eprint(e)
+
+    req.post('crowd', 'user', json=user.get_crowd_format(), errors=errors)
+    print('The user {} has been registered'.format(user.display_name))
 
 
+@rest_request
 def create_many(users):
     for user in users:
         create(user)
 
 
+@rest_request
 def remove(user):
     errors = {
         'message': 'Could not delete user {}'.format(user.display_name),
@@ -32,18 +33,18 @@ def remove(user):
             404: 'The user could not be found'
         }
     }
-    try:
-        req.delete('crowd', 'user', params={'username': user.username}, errors=errors)
-        print('The user {} as been deleted'.format(user.display_name))
-    except Exceptions.RequestException as e:
-        eprint(e)
+
+    req.delete('crowd', 'user', params={'username': user.username}, errors=errors)
+    print('The user {} as been deleted'.format(user.display_name))
 
 
+@rest_request
 def remove_many(users):
     for user in users:
         remove(user)
 
 
+@rest_request
 def add_to_groups(user, groups, create=False):
     if create:
         Groups.create_jira(groups)
@@ -59,13 +60,12 @@ def add_to_groups(user, groups, create=False):
         }
         params = {'username': user.username}
         json = {'name': group}
-        try:
-            req.post('crowd', 'user/group/direct', params=params, json=json, errors=errors)
-            print('The user {} has been added to the group {}'.format(user.display_name, group))
-        except Exceptions.RequestException as e:
-            eprint(e)
+
+        req.post('crowd', 'user/group/direct', params=params, json=json, errors=errors)
+        print('The user {} has been added to the group {}'.format(user.display_name, group))
 
 
+@rest_request
 def add_many_to_groups(users, groups, create=False):
     if create:
         Groups.create_jira(groups)

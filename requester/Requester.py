@@ -4,6 +4,23 @@ import requests
 
 from exceptions import Exceptions
 from schema import yaml_loader
+from util import eprint
+
+
+def rest_request(func):
+    def wrapper(*args, **kwargs):
+
+        safe_run = kwargs.get('safe', False)
+        'safe' not in kwargs or kwargs.pop('safe')
+        if safe_run:
+            try:
+                return func(*args, **kwargs)
+            except Exceptions.RequestException as e:
+                eprint(e)
+        else:
+            return func(*args, **kwargs)
+
+    return wrapper
 
 
 class Requester:

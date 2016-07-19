@@ -1,9 +1,8 @@
 from atlas import Roles
-from exceptions import Exceptions
-from requester.Requester import req
-from util import eprint
+from requester.Requester import req, rest_request
 
 
+@rest_request
 def add_with_role(project_key, user, role_name):
     role = Roles.get(role_name) or {}
     role_id = role.get('id', None)
@@ -13,13 +12,11 @@ def add_with_role(project_key, user, role_name):
             404: 'Either the group, the role or the project does not exist or the user is already in it'
         }
     }
-    try:
-        req.post('jira', 'project/{}/role/{}'.format(project_key, role_id), json={'user': [user]}, errors=errors)
-        print('The user {} has been added to the project {} for the role {}'.format(user, project_key, role_name))
-    except Exceptions.RequestException as e:
-        eprint(e)
+    req.post('jira', 'project/{}/role/{}'.format(project_key, role_id), json={'user': [user]}, errors=errors)
+    print('The user {} has been added to the project {} for the role {}'.format(user, project_key, role_name))
 
 
+@rest_request
 def create_jira(key, name, lead, description='', project_type='business'):
     """
     The key must be in uppercase, and its length in [2,10]
@@ -37,14 +34,12 @@ def create_jira(key, name, lead, description='', project_type='business'):
             400: 'Invalid request. Leader unknown or the project already exists'
         }
     }
-    try:
-        response = req.post('jira', 'project', json=project, errors=errors)
-        print('The project {} has been created'.format(name))
-        return response
-    except Exceptions.RequestException as e:
-        eprint(e)
+    response = req.post('jira', 'project', json=project, errors=errors)
+    print('The project {} has been created'.format(name))
+    return response
 
 
+@rest_request
 def create_bitbucket(key, name, description=''):
     project = {
         'key': key,
@@ -58,14 +53,12 @@ def create_bitbucket(key, name, description=''):
             409: 'The project key or name is already in use'
         }
     }
-    try:
-        response = req.post('stash', 'projects', json=project, errors=errors)
-        print('The bitbucket project {} has been created'.format(name))
-        return response
-    except Exceptions.RequestException as e:
-        eprint(e)
+    response = req.post('stash', 'projects', json=project, errors=errors)
+    print('The bitbucket project {} has been created'.format(name))
+    return response
 
 
+@rest_request
 def delete_jira(key):
     errors = {
         'message': 'Could not delete jira project {}'.format(key),
@@ -74,13 +67,11 @@ def delete_jira(key):
             404: 'The project does not exist'
         }
     }
-    try:
-        req.delete('jira', 'project/{}'.format(key), errors=errors)
-        print('The jira project {} has been deleted'.format(key))
-    except Exceptions.RequestException as e:
-        eprint(e)
+    req.delete('jira', 'project/{}'.format(key), errors=errors)
+    print('The jira project {} has been deleted'.format(key))
 
 
+@rest_request
 def delete_bitbucket(key):
     errors = {
         'message': 'Could not delete bitbucket project {}'.format(key),
@@ -90,13 +81,11 @@ def delete_bitbucket(key):
             409: 'The project can not be deleted as it contains repositories',
         }
     }
-    try:
-        req.delete('stash', 'projects/{}'.format(key), errors=errors)
-        print('The bitbucket project {} has been deleted'.format(key))
-    except Exceptions.RequestException as e:
-        eprint(e)
+    req.delete('stash', 'projects/{}'.format(key), errors=errors)
+    print('The bitbucket project {} has been deleted'.format(key))
 
 
+@rest_request
 def get_jira(key):
     key = key.upper()
     errors = {
@@ -105,12 +94,10 @@ def get_jira(key):
             404: 'Project not found'
         }
     }
-    try:
-        return req.get('jira', 'project/{}'.format(key), errors=errors)
-    except Exceptions.RequestException as e:
-        eprint(e)
+    return req.get('jira', 'project/{}'.format(key), errors=errors)
 
 
+@rest_request
 def get_bitbucket(key):
     key = key.upper()
     errors = {
@@ -119,14 +106,9 @@ def get_bitbucket(key):
             404: 'Project not found'
         }
     }
-    try:
-        return req.get('stash', 'projects/{}'.format(key), errors=errors)
-    except Exceptions.RequestException as e:
-        eprint(e)
+    return req.get('stash', 'projects/{}'.format(key), errors=errors)
 
 
+@rest_request
 def get_all_jira():
-    try:
-        return req.get('jira', 'project')
-    except Exceptions.RequestException as e:
-        eprint(e)
+    return req.get('jira', 'project')

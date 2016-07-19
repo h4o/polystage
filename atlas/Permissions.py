@@ -1,9 +1,10 @@
 from atlas import Roles
 from exceptions import Exceptions
-from requester.Requester import req
+from requester.Requester import req, rest_request
 from util import eprint
 
 
+@rest_request
 def create(name):
     errors = {
         'message': 'The permission scheme {} could not be created'.format(name),
@@ -14,23 +15,20 @@ def create(name):
     json = {
         'name': name
     }
-    try:
-        scheme = req.post('jira', 'permissionscheme', json=json, errors=errors)
-        print('The permission scheme {} has been created'.format(name))
-        return scheme
-    except Exceptions.RequestException as e:
-        eprint(e)
+
+    scheme = req.post('jira', 'permissionscheme', json=json, errors=errors)
+    print('The permission scheme {} has been created'.format(name))
+    return scheme
 
 
+@rest_request
 def delete(name):
-    try:
-        scheme = get(name)
-        req.delete('jira', 'permissionscheme/{}'.format(scheme['id']))
-        print('The permission {} has been deleted'.format(name))
-    except Exceptions.RequestException as e:
-        eprint(e)
+    scheme = get(name)
+    req.delete('jira', 'permissionscheme/{}'.format(scheme['id']))
+    print('The permission {} has been deleted'.format(name))
 
 
+@rest_request
 def create_permission(scheme_name, type, name, perm):
     """
     Type can be either group, projectRole or user
@@ -41,23 +39,22 @@ def create_permission(scheme_name, type, name, perm):
             400: 'Bad arguments'
         }
     }
-    try:
-        scheme = get(scheme_name)
-        json = {
-            'holder': {
-                'type': type,
-                'parameter': _get_entity_id(type, name)
-            },
-            'permission': perm.upper()
-        }
-        response = req.post('jira', 'permissionscheme/{}/permission'.format(scheme['id']), json=json,
-                            params={'expand': 'group'}, errors=errors)
-        print('The permission {} for the {} {} has been created'.format(perm, type, name))
-        return response
-    except Exceptions.RequestException as e:
-        eprint(e)
+
+    scheme = get(scheme_name)
+    json = {
+        'holder': {
+            'type': type,
+            'parameter': _get_entity_id(type, name)
+        },
+        'permission': perm.upper()
+    }
+    response = req.post('jira', 'permissionscheme/{}/permission'.format(scheme['id']), json=json,
+                        params={'expand': 'group'}, errors=errors)
+    print('The permission {} for the {} {} has been created'.format(perm, type, name))
+    return response
 
 
+@rest_request
 def _get_entity_id(type, name):
     entity_id = None
     if type == 'group':
@@ -69,6 +66,7 @@ def _get_entity_id(type, name):
     return entity_id
 
 
+@rest_request
 def get(name):
     schemes = get_all() or []
     match = None
@@ -84,18 +82,14 @@ def get(name):
     return match
 
 
+@rest_request
 def assign_to_project(project_key, scheme_name):
-    try:
-        scheme = get(scheme_name)
-        req.put('jira', 'project/{}/permissionscheme'.format(project_key), json={'id': scheme['id']})
-        print('The scheme {} has been assigned to the project {}'.format(scheme_name, project_key))
-    except Exceptions.RequestException as e:
-        eprint(e)
+    scheme = get(scheme_name)
+    req.put('jira', 'project/{}/permissionscheme'.format(project_key), json={'id': scheme['id']})
+    print('The scheme {} has been assigned to the project {}'.format(scheme_name, project_key))
 
 
+@rest_request
 def get_all():
-    try:
-        schemes = req.get('jira', 'permissionscheme')['permissionSchemes']
-        return schemes
-    except Exceptions.RequestException as e:
-        eprint(e)
+    schemes = req.get('jira', 'permissionscheme')['permissionSchemes']
+    return schemes
