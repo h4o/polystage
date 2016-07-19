@@ -1,12 +1,12 @@
 global:
-  tag: Lion
+  tag: Demo
   type: business
   admin: mosser
-  applink: true
+  applink: false
   repositories:
-    - Chat
+    - RepoDemo
 projects:
-  - name: Chien
+  - name: Project Demo
     lead: ln404361
     developers:
       - ln404361

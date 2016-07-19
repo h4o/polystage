@@ -41,10 +41,6 @@ def import_projects(file_path):
     Permissions.create_permission(params['tag'], 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS')
 
 
-def _name_to_key(name):
-    return name[:10].replace(' ', '').upper()
-
-
 def _import_project(project, params):
     project_type = params.get('type', 'business')
     key = project.get('key') or _name_to_key(project['name'])
@@ -58,6 +54,7 @@ def _import_project(project, params):
     if params.get('applink', True):
         Applinks.link(key, key)
 
+    Projects.add_with_role(key, params['admin'], 'supervisors')
     for dev in project['developers']:
         Projects.add_with_role(key, dev, dev_role['name'])
     for sup in project.get('supervisors', []):
@@ -107,3 +104,7 @@ def import_multi_repo(multi_repo_file):
 def _create_set_repo(repo, params):
     Repos.create(params['key'], repo['name'])
     # TODO set permissions
+
+
+def _name_to_key(name):
+    return name[:10].replace(' ', '').upper()

@@ -81,7 +81,7 @@ def delete_jira(key):
         eprint(e)
 
 
-def delete_bitbucket(key, delete_repositories=False):
+def delete_bitbucket(key):
     errors = {
         'message': 'Could not delete bitbucket project {}'.format(key),
         'reasons': {

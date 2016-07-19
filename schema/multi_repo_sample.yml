@@ -1,8 +1,8 @@
 global:
   name: Devint
-  # key: # a key could be set here
+  # key: # a key can be set here
   # applink: # link between the project and the repos. False by default
-  # type: # default :
+  # type: # default : business
   admin: mosser
   supervisors:
     - aj404161
