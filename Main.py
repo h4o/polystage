@@ -1,4 +1,4 @@
-from atlas.Command import Script
+
 from exceptions import Exceptions
 from scripts import Scripts
 from atlas import Permissions, Projects, Repos, Applinks, Groups, Roles, User, Users
@@ -23,20 +23,24 @@ if __name__ == '__main__':
     # yesKwargs('First param, safe', safe=True)
     # yesKwargs('First param', kone='kone', yaya='youyou')
     # yesKwargs('First param, safe', kone='kone', safe=True)
+    #
+    #
+    # name = "OKKOOKKO"
+    # Projects.DeleteBitbucket(name).do(safe=True)
+    # print('______________________________')
+    #
+    # create = Projects.CreateBitbucket(name, name)
+    # delete = Projects.DeleteBitbucket(name)
+    # s = Script()
+    # s.append(create)
+    # s.append(create)
+    # s.append(delete)
+    #
+    # s.execute()
 
+    # Scripts.remove_students('students.csv')
+    Scripts.import_students('students.csv', ['jira-users', 'Les zouzous du dimanche'], create_groups=True)
 
-    name = "OKKOOKKO"
-    Projects.DeleteBitbucket(name).do(safe=True)
-    print('______________________________')
-
-    create = Projects.CreateBitbucket(name, name)
-    delete = Projects.DeleteBitbucket(name)
-    s = Script()
-    s.append(create)
-    s.append(create)
-    s.append(delete)
-
-    s.execute()
 
 
 

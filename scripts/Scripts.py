@@ -7,8 +7,28 @@ from schema import yaml_loader
 from util import eprint
 
 
+def load_students(user_file):
+    users = []
+    with open(user_file) as f:
+        users_csv = csv.reader(f, delimiter=';')
+        for row in users_csv:
+            user = Student(row)
+            users.append(user)
+    return users
 
 
+def remove_students(user_file):
+    students = load_students(user_file)
+    Users.RemoveMany(students).do()
+
+
+def import_students(user_file, groups, create_groups=False):
+    students = load_students(user_file)
+    s = Script()
+    for student in students:
+        s.append(Users.Create(student))
+    s.append(Users.AddManyToGroups(students, groups, create_groups))
+    s.execute()
 
 
 class Script:
@@ -25,36 +45,20 @@ class Script:
                 p = i
                 cmd.do()
         except Exceptions.RequestException as e:
-            eprint('Failure, trying to revert. Reason : ', e)
+            eprint('Failure: ', e, '\nTrying to undo:')
             self._revert(p)
 
     def _revert(self, i):
-        undo_list = self.commands[0:i][::1]
+        undo_list = self.commands[0:i][::-1]
         for cmd in undo_list:
             cmd.undo()
 
 #
 #
-# def load_students(user_file):
-#     users = []
-#     with open(user_file) as f:
-#         users_csv = csv.reader(f, delimiter=';')
-#         for row in users_csv:
-#             user = Student(row)
-#             users.append(user)
-#     return users
+
 #
 #
-# def import_students(user_file, groups, create_groups=False):
-#     students = load_students(user_file)
-#     Users.create_many(students)
-#     Users.add_many_to_groups(students, groups, create_groups)
-#
-#
-# def remove_students(user_file):
-#     students = load_students(user_file)
-#     Users.remove_many(students)
-#
+
 #
 # def import_projects(file_path):
 #     p = yaml_loader.load(file_path, 'schema/project_schema.yml')

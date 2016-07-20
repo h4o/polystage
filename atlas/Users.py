@@ -1,11 +1,11 @@
 from atlas import Groups
-from atlas.Command import NotUndoable
+from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
 from requester.Requester import req, rest_request
 from util import eprint
 
 
-class Create(NotUndoable):
+class Create(Command):
     def __init__(self, user):
         self.user = user
 
@@ -21,14 +21,21 @@ class Create(NotUndoable):
         req.post('crowd', 'user', json=self.user.get_crowd_format(), errors=errors)
         print('The user {} has been registered'.format(self.user.display_name))
 
+    def _undo(self):
+        Remove(self.user).do()
 
-class CreateMany(NotUndoable):
-    def __init__(self, users):
-        self.users = users
 
-    def _do(self):
-        for user in self.users:
-            Create(user).do()
+# class CreateMany(Command):
+#     def __init__(self, users):
+#         self.users = users
+#
+#     def _do(self):
+#         for user in self.users:
+#             Create(user).do()
+#
+#     def _undo(self):
+#         for user in self.users:
+
 
 
 class Remove(NotUndoable):
