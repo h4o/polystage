@@ -1,57 +1,78 @@
+from atlas.Command import NotUndoable
 from exceptions import Exceptions
 from requester.Requester import req, rest_request
 from util import eprint
 
 
-@rest_request
-def create(project_key, name, scm_id='git', forkable=True):
-    errors = {
-        'message': 'Could not create the repository {}'.format(name),
-        'reasons': {
-            409: 'The repository already exists'
+class Create(NotUndoable):
+    def __init__(self, project_key, name, scm_id='git', forkable=True):
+        self.project_key = project_key
+        self.name = name
+        self.scm_id = scm_id
+        self.forkable = forkable
+
+    def _do(self):
+        errors = {
+            'message': 'Could not create the repository {}'.format(self.name),
+            'reasons': {
+                409: 'The repository already exists'
+            }
         }
-    }
-    json = {
-        'name': name,
-        'scmId': scm_id,
-        'forkable': forkable
-    }
+        json = {
+            'name': self.name,
+            'scmId': self.scm_id,
+            'forkable': self.forkable
+        }
 
-    req.post('stash', 'projects/{}/repos'.format(project_key), json=json, errors=errors)
-    print('The repository {} has been created'.format(name))
-
-
-@rest_request
-def delete(project_key, repo_name):
-    message = 'Could not delete the repo {} from the project {}'.format(repo_name, project_key)
-    reason = 'The repo does not exist'
-    repo = get(project_key, repo_name) or {}
-    repo_slug = repo.get('slug')
-    if not repo_slug:
-        raise Exceptions.RequestException(message, reason, None)
-    req.delete('stash', 'projects/{}/repos/{}'.format(project_key, repo_slug))
-    print('The repository {} from the project {} has been deleted'.format(repo_name, project_key))
+        req.post('stash', 'projects/{}/repos'.format(self.project_key), json=json, errors=errors)
+        print('The repository {} has been created'.format(self.name))
 
 
-@rest_request
-def delete_all(project_key):
-    repos = get_all(project_key)
+class Delete(NotUndoable):
+    def __init__(self, project_key, repo_name):
+        self.project_key = project_key
+        self.repo_name = repo_name
 
-    for repo in repos:
-        delete(project_key, repo['name'])
-
-
-@rest_request
-def get(project_key, repo_name):
-    repos = get_all(project_key)
-    match = None
-    for repo in repos:
-        if repo['name'].upper() == repo_name.upper():
-            match = repo
-            break
-    return match
+    def _do(self):
+        message = 'Could not delete the repo {} from the project {}'.format(self.repo_name, self.project_key)
+        reason = 'The repo does not exist'
+        repo = Get(self.project_key, self.repo_name).do() or {}
+        repo_slug = repo.get('slug')
+        if not repo_slug:
+            raise Exceptions.RequestException(message, reason, None)
+        req.delete('stash', 'projects/{}/repos/{}'.format(self.project_key, repo_slug))
+        print('The repository {} from the project {} has been deleted'.format(self.repo_name, self.project_key))
 
 
-@rest_request
-def get_all(project_key):
-    return req.get('stash', 'projects/{}/repos'.format(project_key))['values']
+class DeleteAll(NotUndoable):
+    def __init__(self, project_key):
+        self.project_key = project_key
+
+    def _do(self):
+        repos = GetAll(self.project_key).do()
+
+        for repo in repos:
+            Delete(self.project_key, repo['name'])
+
+
+class Get(NotUndoable):
+    def __init__(self, project_key, repo_name):
+        self.project_key = project_key
+        self.repo_name = repo_name
+
+    def _do(self):
+        repos = GetAll(self.project_key).do()
+        match = None
+        for repo in repos:
+            if repo['name'].upper() == self.repo_name.upper():
+                match = repo
+                break
+        return match
+
+
+class GetAll(NotUndoable):
+    def __init__(self, project_key):
+        self.project_key = project_key
+
+    def _do(self):
+        return req.get('stash', 'projects/{}/repos'.format(self.project_key))['values']

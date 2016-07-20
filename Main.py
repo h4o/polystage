@@ -1,3 +1,4 @@
+from atlas.Command import Script
 from exceptions import Exceptions
 from scripts import Scripts
 from atlas import Permissions, Projects, Repos, Applinks, Groups, Roles, User, Users
@@ -7,10 +8,14 @@ if __name__ == '__main__':
     # Scripts.import_projects('schema/project_sample.yml')
     # Scripts.import_multi_repo('schema/multi_repo_sample.yml')
 
-    Projects.create_bitbucket('ANNOT', 'To delete', safe=True)
-    Projects.create_bitbucket('ANNOT', 'To delete', safe=True)
+    # Projects.CreateBitbucket('ANNOT', 'To delete').do(safe=False)
+    # Projects.CreateBitbucket('ANNOT', 'To delete').do(safe=True)
+    # Projects.CreateBitbucket('ANNOT', 'To delete').do(safe=True)
     # Projects.delete_bitbucket('ANNOT', safe=True)
-    Projects.delete_bitbucket('ANNOT')
+    # Projects.DeleteBitbucket('ANNOT').do()
+
+    # cmd.do(safe=True)
+    # cmd.undo()
 
     # noKwargs('First param')
     # noKwargs('First param, safe', safe=True)
@@ -20,7 +25,18 @@ if __name__ == '__main__':
     # yesKwargs('First param, safe', kone='kone', safe=True)
 
 
+    name = "OKKOOKKO"
+    Projects.DeleteBitbucket(name).do(safe=True)
+    print('______________________________')
 
+    create = Projects.CreateBitbucket(name, name)
+    delete = Projects.DeleteBitbucket(name)
+    s = Script()
+    s.append(create)
+    s.append(create)
+    s.append(delete)
+
+    s.execute()
 
 
 
