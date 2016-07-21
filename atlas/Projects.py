@@ -148,3 +148,11 @@ class GetBitbucket(NotUndoable):
 class GetAllJira(NotUndoable):
     def _do(self):
         return req.get('jira', 'project')
+
+
+class GetIssues(NotUndoable):
+    def __init__(self, project_key):
+        self.project_key = project_key
+
+    def _do(self):
+        return req.get('jira', 'search?jql=project={}&maxResults=-1'.format(self.project_key))['issues']

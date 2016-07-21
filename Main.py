@@ -1,29 +1,23 @@
+import json
+from operator import itemgetter
 
+from openpyxl import Workbook
+from texttable import Texttable
+
+from excel.Widgets import IssuesStatus
 from exceptions import Exceptions
+from requester.Requester import req
 from scripts import Scripts
 from atlas import Permissions, Projects, Repos, Applinks, Groups, Roles, User, Users
 from util import eprint
 
 if __name__ == '__main__':
-    # Scripts.import_projects('schema/project_sample.yml')
-    # Scripts.import_multi_repo('schema/multi_repo_sample.yml')
+    wb = Workbook()
+    ws = wb.active
 
-    # Projects.CreateBitbucket('ANNOT', 'To delete').do(safe=False)
-    # Projects.CreateBitbucket('ANNOT', 'To delete').do(safe=True)
-    # Projects.CreateBitbucket('ANNOT', 'To delete').do(safe=True)
-    # Projects.delete_bitbucket('ANNOT', safe=True)
-    # Projects.DeleteBitbucket('ANNOT').do()
-
-    # cmd.do(safe=True)
-    # cmd.undo()
-
-    # noKwargs('First param')
-    # noKwargs('First param, safe', safe=True)
-    # yesKwargs('First param')
-    # yesKwargs('First param, safe', safe=True)
-    # yesKwargs('First param', kone='kone', yaya='youyou')
-    # yesKwargs('First param, safe', kone='kone', safe=True)
-    #
+    s = IssuesStatus('ISLBD')
+    s.write(ws, 0, 0)
+    wb.save('ISLBD.xlsx')
     #
     # name = "OKKOOKKO"
     # Projects.DeleteBitbucket(name).do(safe=True)
@@ -39,18 +33,4 @@ if __name__ == '__main__':
     # s.execute()
 
     # Scripts.remove_students('students.csv')
-    Scripts.import_students('students.csv', ['jira-users', 'Les zouzous du dimanche'], create_groups=True)
-
-
-
-
-
-
-
-
-
-
-    # from atlas import Projects, Permissions
-    # Projects.delete_jira('PROJECTDE')
-    # Projects.delete_bitbucket('PROJECTDE')
-    # Permissions.delete('Demo')
+    # Scripts.import_students('students.csv', ['jira-users', 'Les zouzous du dimanche'], create_groups=True)
