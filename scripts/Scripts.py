@@ -45,7 +45,7 @@ class Script:
                 p = i
                 cmd.do()
         except Exceptions.RequestException as e:
-            eprint('Failure: ', e, '\nTrying to undo:')
+            eprint('Failure:', e, '\nTrying to undo:')
             self._revert(p)
 
     def _revert(self, i):

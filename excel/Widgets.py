@@ -1,15 +1,16 @@
 from abc import ABC, abstractmethod
-
 from atlas import Projects
+from openpyxl import Workbook
+from openpyxl.utils import coordinate_from_string, column_index_from_string, rows_from_range, coordinate_to_tuple
 
 
 class Widget(ABC):
-    def write(self, worksheet, col, line):
+    def write(self, worksheet, cell='A1'):
         self._fetch()
-        self._write(worksheet, col, line)
+        self._write(worksheet, cell)
 
     @abstractmethod
-    def _write(self, worksheet, col, line):
+    def _write(self, worksheet, cell):
         pass
 
     @abstractmethod
@@ -22,10 +23,14 @@ class Table(Widget):
         self.header = []
         self.rows = []
 
-    def _write(self, worksheet, col, line):
-        worksheet.append(self.header)
-        for row in self.rows:
-            worksheet.append(row)
+    def _write(self, worksheet, cell):
+        row, col = coordinate_to_tuple(cell)
+        rows = list(worksheet.get_squared_range(col, row, col-1+len(self.rows[0]), row-1+len(self.rows)))
+        for i, header_cell in enumerate(rows[0]):
+            header_cell.value = self.header[i]
+        for i, row in enumerate(rows[1:]):
+            for j, c in enumerate(row):
+                c.value = self.rows[i][j]
 
     def append(self, *args):
         self.rows.append(args)

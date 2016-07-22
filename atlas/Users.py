@@ -91,6 +91,7 @@ class AddToGroups(NotUndoable):
 
 
 class AddManyToGroups(NotUndoable):
+    #TODO check if a group doesn't already exist before trying to create it
     def __init__(self, users, groups, create=False):
         self.users = users
         self.groups = groups
@@ -98,6 +99,6 @@ class AddManyToGroups(NotUndoable):
 
     def _do(self):
         if self.create:
-            Groups.CreateJira(self.groups).do()
+            Groups.CreateJira(self.groups).do(safe=True)
         for user in self.users:
             AddToGroups(user, self.groups).do()
