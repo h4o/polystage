@@ -156,3 +156,8 @@ class GetIssues(NotUndoable):
 
     def _do(self):
         return req.get('jira', 'search?jql=project={}&maxResults=-1'.format(self.project_key))['issues']
+
+
+class GetIssueTypes(NotUndoable):
+    def _do(self):
+        return req.get('jira', 'issuetype')

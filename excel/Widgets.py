@@ -1,11 +1,15 @@
 from abc import ABC, abstractmethod
 from atlas import Projects
 from openpyxl import Workbook
-from openpyxl.utils import coordinate_from_string, column_index_from_string, rows_from_range, coordinate_to_tuple
+from openpyxl.utils import coordinate_from_string, column_index_from_string, rows_from_range, coordinate_to_tuple, \
+    get_column_letter
 
 
 class Widget(ABC):
-    def write(self, worksheet, cell='A1'):
+    def write(self, worksheet, cell='A1', offset_col=0, offset_row=0):
+        row, col = coordinate_to_tuple(cell)
+        cell = get_column_letter(col + offset_col) + str(row + offset_row)
+
         self._fetch()
         self._write(worksheet, cell)
 
@@ -17,6 +21,11 @@ class Widget(ABC):
     def _fetch(self):
         pass
 
+    @property
+    @abstractmethod
+    def size(self):
+        pass
+
 
 class Table(Widget):
     def __init__(self):
@@ -25,7 +34,8 @@ class Table(Widget):
 
     def _write(self, worksheet, cell):
         row, col = coordinate_to_tuple(cell)
-        rows = list(worksheet.get_squared_range(col, row, col-1+len(self.rows[0]), row-1+len(self.rows)))
+        size_x, size_y = self.size
+        rows = list(worksheet.get_squared_range(col, row, col + size_x - 1, row + size_y - 1))
         for i, header_cell in enumerate(rows[0]):
             header_cell.value = self.header[i]
         for i, row in enumerate(rows[1:]):
@@ -34,6 +44,12 @@ class Table(Widget):
 
     def append(self, *args):
         self.rows.append(args)
+
+    @property
+    def size(self):
+        y = len(self.rows)
+        x = 0 if y == 0 else len(self.rows[0])
+        return x, y + 1
 
 
 class IssuesStatus(Table):
@@ -46,15 +62,52 @@ class IssuesStatus(Table):
         data = {}
         for issue in issues:
             fields = issue['fields']
-            name = (fields['assignee'] or {}).get('displayName', 'unassigned')
+            assignee = (fields['assignee'] or {}).get('displayName', 'unassigned')
             resolution = fields['resolution']
             resolution = 'Open' if resolution is None else fields['status']['name']
-            if name not in data:
-                data[name] = {}
-            if resolution not in data[name]:
-                data[name][resolution] = 0
-            data[name][resolution] += 1
+            if assignee not in data:
+                data[assignee] = {'Assignee': assignee}
+            if resolution not in data[assignee]:
+                data[assignee][resolution] = 0
+            data[assignee][resolution] += 1
 
         self.header = ['Assignee', 'Open', 'Resolved', 'Closed']
-        for k, v in data.items():
-            self.append(k, v.get('Open', 0), v.get('Resolved', 0), v.get('Closed', 0))
+        tuples = sorted(data.values(), key=lambda i: i['Assignee'])
+        self.rows = []
+        for t in tuples:
+            self.append(t.get('Assignee'), t.get('Open', 0), t.get('Resolved', 0), t.get('Closed', 0))
+
+
+class IssuesType(Table):
+    def __init__(self, project_key, types=None):
+        self.types = types or ['Bug', 'Improvement', 'New Feature', 'Sub-task', 'Task', 'Technical task']
+        super().__init__()
+        self.project_key = project_key
+
+    def _fetch(self):
+        issues = Projects.GetIssues(self.project_key).do()
+        result = [a for a in Projects.GetIssueTypes().do() if a['name'] in self.types]
+        issue_types = {}
+        for i in result:
+            issue_types[i['id']] = i
+        data = {}
+        for issue in issues:
+            fields = issue['fields']
+            assignee = (fields['assignee'] or {}).get('displayName', 'unassigned')
+            type_id = fields['issuetype']['id']
+            if type_id in issue_types:
+                name = issue_types[type_id]['name']
+                if assignee not in data:
+                    data[assignee] = {'Assignee': assignee}
+                if name not in data[assignee]:
+                    data[assignee][name] = 0
+                data[assignee][name] += 1
+
+        self.header = ['Assignee'] + self.types
+        tuples = sorted(data.values(), key=lambda i: i['Assignee'])
+        self.rows = []
+        for t in tuples:
+            values = [t['Assignee']]
+            for type_field in self.types:
+                values.append(t.get(type_field, 0))
+            self.append(*values)
