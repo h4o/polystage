@@ -1,26 +1,27 @@
-import json
-from operator import itemgetter
-
 from openpyxl import Workbook
-from texttable import Texttable
-
-from atlas import Projects
 from excel import Widgets
-from scripts import Scripts
+from scripts import Scripts, projects
+from schema.yaml_loader import load
+from util.util import pp
 
 if __name__ == '__main__':
-    wb = Workbook()
-    ws = wb.active
+    i = 3
 
-    status = Widgets.IssuesStatus('ISLBD')
-    types = Widgets.IssuesType('ISLBD')
+    if i == 0:
+        Scripts.import_students('students.csv', ['jira-users', 'Les zouzous du dimanche'], create_groups=True)
+    if i == 1:
+        wb = Workbook()
+        ws = wb.active
 
-    status.write(ws, 'A1')
-    types.write(ws, 'A1', offset_row=status.size[1] + 2)
-    types.write(ws, 'A1', offset_col=status.size[0] + 4)
+        status = Widgets.IssuesStatus('ISLBD')
+        types = Widgets.IssuesType('ISLBD')
 
-    wb.save('ISLBD.xlsx')
+        status.write(ws, 'A1')
+        types.write(ws, 'A1', offset_row=status.size[1] + 2)
+        types.write(ws, 'A1', offset_col=status.size[0] + 4)
 
-
-
-    # Scripts.import_students('students.csv', ['jira-users', 'Les zouzous du dimanche'], create_groups=True)
+        wb.save('ISLBD.xlsx')
+    if i == 2:
+        pass
+    if i == 3:
+        file = projects.create_multi_project('schema/ISL_script.yml')

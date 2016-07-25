@@ -1,0 +1,17 @@
+params:
+  tag: ISL
+  type: software
+  supervisors:
+    - mosser
+    - gc203248
+  readers:
+    - bk101086
+  repositories:
+    - private
+projects:
+  - id: AA
+    name: Cobblestone
+    developers: [ln404361, fl407746, jl201213, nn200057]
+  - id: AB
+    developers: [sl200103, st405262, nc201038, wq105385]
+    supervisors: [ct106586]

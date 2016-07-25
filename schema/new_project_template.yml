@@ -1,0 +1,25 @@
+type: //rec
+required:
+  params:
+    type: //rec
+    required:
+      tag: //str
+      supervisors: {type: //arr, contents: //str, length: {min: 1}}
+    optional:
+      readers: {type: //arr, contents: //str, length: {min: 1}}
+      type: //str
+      applink: //bool
+      repositories: {type: //arr, contents: //str}
+
+  projects:
+    type: //arr
+    contents:
+      type: //rec
+      required:
+        id: //str
+        developers: {type: //arr, contents: //str}
+      optional:
+        name: //str
+        lead: //str
+        supervisors: {type: //arr, contents: //str}
+        readers: {type: //arr, contents: //str}

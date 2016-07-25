@@ -53,13 +53,28 @@ class Script:
         for cmd in undo_list:
             cmd.undo()
 
-#
-#
 
-#
-#
+class ReversibleRunner:
+    """Allow to create a reversible script.
+    Any command run with a instance of this class is stored and ready to be undone if a problem occurs"""
 
-#
+    def __init__(self):
+        self.history = []
+
+    def do(self, command):
+        try:
+            command.do()
+            self.history.insert(0, command)
+        except Exceptions.RequestException as e:
+            eprint('Failure:', e, '\nTrying to undo:')
+            self.revert()
+            # TODO: Create a more explicit exception
+            raise Exception("Script failure")
+
+    def revert(self):
+        for command in self.history:
+            command.undo(safe=True)
+
 # def import_projects(file_path):
 #     p = yaml_loader.load(file_path, 'schema/project_schema.yml')
 #     params = p['global']

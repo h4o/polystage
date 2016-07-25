@@ -59,14 +59,15 @@ class Requester:
 
         data, resp = None, None
 
+        accept_json = {'Accept': 'application/json'}
         if method == 'get':
-            resp, data = self._get_rec(request, 0, params=params, auth=auth, headers={'Accept': 'application/json'})
+            resp, data = self._get_rec(request, 0, params=params, auth=auth, headers=accept_json)
         elif method == 'post':
-            resp = self.s.post(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
+            resp = self.s.post(request, json=json, params=params, auth=auth, headers=accept_json, verify=False,)
         elif method == 'put':
-            resp = self.s.put(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
+            resp = self.s.put(request, json=json, params=params, auth=auth, headers=accept_json, verify=False,)
         elif method == 'delete':
-            resp = self.s.delete(request, json=json, params=params, auth=auth, headers={'Accept': 'application/json'})
+            resp = self.s.delete(request, json=json, params=params, auth=auth, headers=accept_json, verify=False,)
 
         try:
             data = data or resp.json()

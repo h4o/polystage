@@ -1,12 +1,14 @@
 global:
+
   tag: Demo
   type: business
-  admin: mosser
   applink: false
   repositories:
     - RepoDemo
+
 projects:
   - name: Project Demo
+    key : ISLBD
     lead: ln404361
     developers:
       - ln404361
@@ -14,3 +16,9 @@ projects:
       - aj404161
     supervisors:
       - aj404161
+
+
+
+
+  # Vérifier avant la création d'un project tout ou rien
+  # Ajouter des readers browse, comment, read, clone pas push
