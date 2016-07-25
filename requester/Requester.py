@@ -111,5 +111,5 @@ class Requester:
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
-# req = Requester('requester/cred_server.yml')
-req = Requester('requester/credentials.yml')
+req = Requester('requester/cred_server.yml')
+# req = Requester('requester/credentials.yml')

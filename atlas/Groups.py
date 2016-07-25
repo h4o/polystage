@@ -1,10 +1,10 @@
-from atlas.Command import NotUndoable
+from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
 from requester.Requester import req, rest_request
 from util import eprint
 
 
-class GetGroups(NotUndoable):
+class GetAll(NotUndoable):
     def _do(self):
         errors = {
             'message': 'Could not get groups',
@@ -17,26 +17,42 @@ class GetGroups(NotUndoable):
         return req.get('crowd', 'search', params=params, errors=errors)['groups']
 
 
-class CreateJira(NotUndoable):
-    def __init__(self, groups):
-        self.groups = groups
+class Get(NotUndoable):
+    def __init__(self, groupname):
+        self.groupname = groupname
+
+    def _do(self, safe=False):
+        errors = {
+            'message': 'Could not get the group {}'.format(self.groupname),
+            'reasons': {
+                404: 'The group was not found'
+            }
+        }
+        return req.get('crowd', 'group', params={'groupname': self.groupname}, errors=errors)
+
+
+class Create(Command):
+    def __init__(self, group):
+        self.group = group
 
     def _do(self):
-        for group in self.groups:
-            errors = {
-                'message': 'Could not create group {}'.format(group),
-                'reasons': {
-                    400: 'Group already exists',
-                    403: 'Application is not allowed to create a new group'
-                }
+        errors = {
+            'message': 'Could not create group {}'.format(self.group),
+            'reasons': {
+                400: 'Group already exists',
+                403: 'Application is not allowed to create a new group'
             }
+        }
 
-            json = {'name': group, 'description': '', 'type': 'GROUP'}
-            req.post('crowd', 'group', json=json, errors=errors)
-            print('The group {} as been added'.format(group))
+        json = {'name': self.group, 'description': '', 'type': 'GROUP'}
+        req.post('crowd', 'group', json=json, errors=errors)
+        print('The group {} as been created'.format(self.group))
+
+    def _undo(self):
+        Delete(self.group).do()
 
 
-class DeleteJira(NotUndoable):
+class Delete(NotUndoable):
     def __init__(self, group):
         self.group = group
 

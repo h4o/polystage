@@ -1,10 +1,11 @@
 import csv
 
-from atlas import Users, Permissions, Applinks, Projects, Roles, Repos
+from atlas import Users, Permissions, Applinks, Projects, Roles, Repos, Groups
 from atlas.User import Student
 from exceptions import Exceptions
 from schema import yaml_loader
 from util import eprint
+from util.util import pp
 
 
 def load_students(user_file):
@@ -22,13 +23,20 @@ def remove_students(user_file):
     Users.RemoveMany(students).do()
 
 
-def import_students(user_file, groups, create_groups=False):
+def import_students(user_file, groups):
+    s = ReversibleRunner()
     students = load_students(user_file)
-    s = Script()
+    group_names = s.do(Groups.GetAll())
+    group_names = [a['name'] for a in group_names]
+    for group in groups:
+        group in group_names or s.do(Groups.Create(group))
+
     for student in students:
-        s.append(Users.Create(student))
-    s.append(Users.AddManyToGroups(students, groups, create_groups))
-    s.execute()
+        s.do(Users.Create(student))
+        for group in groups:
+            s.do(Users.AddToGroup(student.username, group), never_undo=True)
+
+    return s
 
 
 class Script:
@@ -61,10 +69,12 @@ class ReversibleRunner:
     def __init__(self):
         self.history = []
 
-    def do(self, command):
+    def do(self, command, never_undo=False):
         try:
-            command.do()
-            self.history.insert(0, command)
+            result = command.do()
+            if not never_undo:
+                self.history.insert(0, command)
+            return result
         except Exceptions.RequestException as e:
             eprint('Failure:', e, '\nTrying to undo:')
             self.revert()

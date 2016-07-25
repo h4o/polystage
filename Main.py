@@ -2,13 +2,18 @@ from openpyxl import Workbook
 from excel import Widgets
 from scripts import Scripts, projects
 from schema.yaml_loader import load
-from util.util import pp
+from util.util import pp, eprint
 
 if __name__ == '__main__':
-    i = 3
+    i = 0
 
     if i == 0:
-        Scripts.import_students('students.csv', ['jira-users', 'Les zouzous du dimanche'], create_groups=True)
+        try:
+            script = Scripts.import_students('students.csv', ['jira-users', 'Les poids lourds de l\'amour'])
+            script.revert()
+            # Scripts.remove_students('students.csv')
+        except Exception as e:
+            eprint(e)
     if i == 1:
         wb = Workbook()
         ws = wb.active

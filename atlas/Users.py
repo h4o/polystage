@@ -25,19 +25,6 @@ class Create(Command):
         Remove(self.user).do()
 
 
-# class CreateMany(Command):
-#     def __init__(self, users):
-#         self.users = users
-#
-#     def _do(self):
-#         for user in self.users:
-#             Create(user).do()
-#
-#     def _undo(self):
-#         for user in self.users:
-
-
-
 class Remove(NotUndoable):
     def __init__(self, user):
         self.user = user
@@ -64,41 +51,44 @@ class RemoveMany(NotUndoable):
             Remove(user).do()
 
 
-class AddToGroups(NotUndoable):
-    def __init__(self, user, groups, create=False):
+class RemoveFromGroup(NotUndoable):
+    def __init__(self, user, group):
+        self.group = group
         self.user = user
-        self.groups = groups
-        self.create = create
 
     def _do(self):
-        if self.create:
-            Groups.CreateJira(self.groups).do()
-        for group in self.groups:
-            errors = {
-                'message': 'Could not add {} to group {}'.format(self.user.display_name, group),
-                'reasons': {
-                    400: 'The group could not be found',
-                    403: 'The application is not allowed to add the membership',
-                    404: 'The user could not be found',
-                    409: 'The user is already a direct member of the group'
-                }
+        errors = {
+            'message': 'Could not remove the user {} from the group {}'.format(self.user, self.group),
+            'reasons': {
+                403: 'The application is not allowed to delete the membership',
+                404: 'The user or group could not be found'
             }
-            params = {'username': self.user.username}
-            json = {'name': group}
+        }
+        json = {'username': self.user, 'groupname': self.group}
+        req.delete('crowd', 'user/group/direct', json=json, errors=errors)
+        print('The user {} has been removed from the group {}'.format(self.user, self.group))
 
-            req.post('crowd', 'user/group/direct', params=params, json=json, errors=errors)
-            print('The user {} has been added to the group {}'.format(self.user.display_name, group))
 
-
-class AddManyToGroups(NotUndoable):
-    #TODO check if a group doesn't already exist before trying to create it
-    def __init__(self, users, groups, create=False):
-        self.users = users
-        self.groups = groups
-        self.create = create
+class AddToGroup(Command):
+    def __init__(self, username, group):
+        self.username = username
+        self.group = group
 
     def _do(self):
-        if self.create:
-            Groups.CreateJira(self.groups).do(safe=True)
-        for user in self.users:
-            AddToGroups(user, self.groups).do()
+        errors = {
+            'message': 'Could not add {} to group {}'.format(self.username, self.group),
+            'reasons': {
+                400: 'The group could not be found',
+                403: 'The application is not allowed to add the membership',
+                404: 'The user could not be found',
+                409: 'The user is already a direct member of the group'
+            }
+        }
+        params = {'username': self.username}
+        json = {'name': self.group}
+
+        req.post('crowd', 'user/group/direct', params=params, json=json, errors=errors)
+        print('The user {} has been added to the group {}'.format(self.username, self.group))
+
+    def _undo(self):
+        RemoveFromGroup(self.username, self.group).do()

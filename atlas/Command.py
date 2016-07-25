@@ -34,4 +34,4 @@ class Command(ABC):
 
 class NotUndoable(Command):
     def _undo(self):
-        print("Cannot be undone")
+        print(self, "Cannot be undone")
