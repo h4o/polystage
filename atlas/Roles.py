@@ -1,10 +1,10 @@
-from atlas.Command import NotUndoable
+from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
 from requester.Requester import req, rest_request
 from util import eprint
 
 
-class Create(NotUndoable):
+class Create(Command):
     def __init__(self, role_name, description=''):
         self.role_name = role_name
         self.description = description
@@ -20,6 +20,9 @@ class Create(NotUndoable):
         role = req.post('jira', 'role', json={'name': self.role_name, 'description': self.description}, errors=errors)
         print('The role {} has been created'.format(self.role_name))
         return role
+
+    def _undo(self):
+        Delete(self.role_name).do()
 
 
 class Get(NotUndoable):
@@ -37,6 +40,13 @@ class Get(NotUndoable):
 
 
 class GetAll(NotUndoable):
+    """Return a map of the roles:
+    Ex:
+    {
+        'Administrator': ...,
+        'Users': ...
+    }"""
+
     def _do(self):
         errors = {
             'message': 'Could not get roles',

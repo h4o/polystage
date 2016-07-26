@@ -1,6 +1,7 @@
 params:
   tag: ISL
   type: software
+  applink: false
   supervisors:
     - mosser
     - gc203248

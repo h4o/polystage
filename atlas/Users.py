@@ -41,16 +41,6 @@ class Remove(NotUndoable):
         req.delete('crowd', 'user', params={'username': self.user.username}, errors=errors)
         print('The user {} as been deleted'.format(self.user.display_name))
 
-
-class RemoveMany(NotUndoable):
-    def __init__(self, users):
-        self.users = users
-
-    def _do(self):
-        for user in self.users:
-            Remove(user).do()
-
-
 class RemoveFromGroup(NotUndoable):
     def __init__(self, user, group):
         self.group = group

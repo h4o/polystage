@@ -1,15 +1,23 @@
 from openpyxl import Workbook
+
+from atlas import Projects, Users
 from excel import Widgets
-from scripts import Scripts, projects
+from scripts import Scripts, MultiProjects, Students
 from schema.yaml_loader import load
+from scripts.Scripts import ReversibleRunner
 from util.util import pp, eprint
 
+import requests
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 if __name__ == '__main__':
-    i = 0
+    i = 3
 
     if i == 0:
         try:
-            script = Scripts.import_students('students.csv', ['jira-users', 'Les poids lourds de l\'amour'])
+            script = Students.import_students('students.csv', ['jira-users', 'Les poids lourds de l\'amour'])
             script.revert()
             # Scripts.remove_students('students.csv')
         except Exception as e:
@@ -27,6 +35,17 @@ if __name__ == '__main__':
 
         wb.save('ISLBD.xlsx')
     if i == 2:
-        pass
+        Projects.DeleteJira('ISLAA').do(safe=True)
+        Projects.DeleteJira('ISLAB').do(safe=True)
+        Projects.DeleteJira('Cobblestone').do(safe=True)
     if i == 3:
-        file = projects.create_multi_project('schema/ISL_script.yml')
+        script = ReversibleRunner()
+        try:
+            file = MultiProjects.load_multi_project('schema/ISL_script.yml', script)
+            script.revert()
+        except Exception as e:
+            eprint(e)
+            # raise(e)
+    if i == 4:
+        p = Projects.GetAllJira().do(safe=True)
+        pp(p)

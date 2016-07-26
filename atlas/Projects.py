@@ -25,7 +25,7 @@ class AddWithRole(NotUndoable):
                                                                                     self.role_name))
 
 
-class CreateJira(NotUndoable):
+class CreateJira(Command):
     def __init__(self, key, name, lead, description='', project_type='business'):
         self.key = key
         self.name = name
@@ -45,14 +45,17 @@ class CreateJira(NotUndoable):
             'lead': self.lead
         }
         errors = {
-            'message': 'Could not create jira project {}'.format(self.name),
+            'message': 'Could not create jira project {}'.format(self.key),
             'reasons': {
                 400: 'Invalid request. Leader unknown or the project already exists'
             }
         }
         response = req.post('jira', 'project', json=project, errors=errors)
-        print('The project {} has been created'.format(self.name))
+        print('The jira project {} has been created'.format(self.key))
         return response
+
+    def _undo(self):
+        DeleteJira(self.key).do()
 
 
 class CreateBitbucket(Command):
@@ -68,14 +71,14 @@ class CreateBitbucket(Command):
             'description': self.description
         }
         errors = {
-            'message': 'Could not create bitbucket project {}'.format(self.name),
+            'message': 'Could not create bitbucket project {}'.format(self.key),
             'reasons': {
                 400: 'Validation error',
                 409: 'The project key or name is already in use'
             }
         }
         response = req.post('stash', 'projects', json=project, errors=errors)
-        print('The bitbucket project {} has been created'.format(self.name))
+        print('The bitbucket project {} has been created'.format(self.key))
         return response
 
     def _undo(self):
