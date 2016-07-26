@@ -4,8 +4,8 @@ roots:
   crowd: http://134.59.130.155/crowd/
 
 credentials:
-  username: mosser
-  password: admin
+  username: crowd
+  password: mdpfdp
 
 crowd:
   app: polyproject
