@@ -74,5 +74,5 @@ class Delete(NotUndoable):
         }
 
         response = req.delete('jira', 'role/{}'.format(role_id), errors=errors)
-        print('The group has been deleted')
+        print('The role {} has been deleted'.format(self.role_name))
         return response

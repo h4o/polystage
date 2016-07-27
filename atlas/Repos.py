@@ -1,10 +1,10 @@
-from atlas.Command import NotUndoable
+from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
 from requester.Requester import req, rest_request
 from util import eprint
 
 
-class Create(NotUndoable):
+class Create(Command):
     def __init__(self, project_key, name, scm_id='git', forkable=True):
         self.project_key = project_key
         self.name = name
@@ -26,6 +26,9 @@ class Create(NotUndoable):
 
         req.post('stash', 'projects/{}/repos'.format(self.project_key), json=json, errors=errors)
         print('The repository {} has been created'.format(self.name))
+
+    def _undo(self):
+        Delete(self.project_key, self.name).do()
 
 
 class Delete(NotUndoable):

@@ -1,7 +1,7 @@
 from atlas import Projects, Permissions, Applinks, Roles, Repos
 from schema.yaml_loader import load
 from scripts.Scripts import ReversibleRunner, NeverUndo
-from util.util import pp
+from util.util import pp, eprint
 
 
 def load_multi_project_file(file_name):
@@ -28,11 +28,10 @@ def load_multi_project(file_name, script=None):
         script = ReversibleRunner()
 
     _create_roles(script)
+    _create_permissions(params['scheme_name'], script)
 
     for p in data['projects']:
         _create_project(p, params, script)
-
-    _create_permissions(params['scheme_name'], script)
 
     return script
 
@@ -49,7 +48,7 @@ def _create_project(project, params, script):
         for supervisor in project['supervisors']:
             never_undo.do(Projects.AddWithRole(project['key'], supervisor, 'supervisors'))
         for reader in project['readers']:
-            never_undo.do(Projects.AddWithRole(project['key'], reader, 'supervisors'))
+            never_undo.do(Projects.AddWithRole(project['key'], reader, 'readers'))
 
     for repo in params['repositories']:
         script.do(Repos.Create(project['key'], repo))
@@ -59,6 +58,8 @@ def _create_project(project, params, script):
 
 def _create_roles(script):
     roles = script.do(Roles.GetAll())
+    roles = [a['name'] for a in roles]
+
     'developers' in roles or script.do(Roles.Create('developers'))
     'supervisors' in roles or script.do(Roles.Create('supervisors'))
     'readers' in roles or script.do(Roles.Create('readers'))

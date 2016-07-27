@@ -1,4 +1,8 @@
 from abc import ABC, abstractmethod
+
+from openpyxl.chart import Reference, PieChart
+from openpyxl.chart.marker import DataPoint
+
 from atlas import Projects
 from openpyxl import Workbook
 from openpyxl.utils import coordinate_from_string, column_index_from_string, rows_from_range, coordinate_to_tuple, \
@@ -50,6 +54,41 @@ class Table(Widget):
         y = len(self.rows)
         x = 0 if y == 0 else len(self.rows[0])
         return x, y + 1
+
+
+class Pie(Table):
+    def __init__(self, project_key):
+        super().__init__()
+        self.project_key = project_key
+
+    def _write(self, worksheet, cell):
+        super(Pie, self)._write(worksheet, cell)
+
+        row, col = coordinate_to_tuple(cell)
+
+        pie = PieChart()
+        labels = Reference(worksheet, min_col=col, min_row=row + 1, max_row=row + len(self.rows))
+        data = Reference(worksheet, min_col=col + 1, min_row=row, max_row=row + len(self.rows))
+        pie.add_data(data, titles_from_data=True)
+        pie.set_categories(labels)
+        pie.title = "Issues"
+        worksheet.add_chart(pie, cell)
+
+    def _fetch(self):
+        issues = Projects.GetIssues(self.project_key).do()
+        data = {}
+        for issue in issues:
+            fields = issue['fields']
+            resolution = fields['resolution']
+            resolution = 'Open' if resolution is None else fields['status']['name']
+
+            if resolution not in data:
+                data[resolution] = 0
+            data[resolution] += 1
+
+        self.header = ['Key', 'Values']
+        for k, v in data.items():
+            self.append(k, v)
 
 
 class IssuesStatus(Table):

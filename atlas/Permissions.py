@@ -1,11 +1,12 @@
 from atlas import Roles
-from atlas.Command import NotUndoable
+from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
 from requester.Requester import req, rest_request
 from util import eprint
+from util.util import pp
 
 
-class Create(NotUndoable):
+class Create(Command):
     def __init__(self, name):
         self.name = name
 
@@ -23,6 +24,9 @@ class Create(NotUndoable):
         scheme = req.post('jira', 'permissionscheme', json=json, errors=errors)
         print('The permission scheme {} has been created'.format(self.name))
         return scheme
+
+    def _undo(self):
+        Delete(self.name).do()
 
 
 class Delete(NotUndoable):
@@ -47,7 +51,7 @@ class CreatePermission(NotUndoable):
         Type can be either group, projectRole or user
         """
         errors = {
-            'message': 'Could not create the permission {} for the {} {}'.format(self.perm, type, self.name),
+            'message': 'Could not create the permission {} for the {} {}'.format(self.perm, self.type, self.name),
             'reasons': {
                 400: 'Bad arguments'
             }
@@ -56,14 +60,14 @@ class CreatePermission(NotUndoable):
         scheme = Get(self.scheme_name).do()
         json = {
             'holder': {
-                'type': type,
-                'parameter': GetEntityId(type, self.name).do()
+                'type': self.type,
+                'parameter': GetEntityId(self.type, self.name).do()
             },
             'permission': self.perm.upper()
         }
         response = req.post('jira', 'permissionscheme/{}/permission'.format(scheme['id']), json=json,
                             params={'expand': 'group'}, errors=errors)
-        print('The permission {} for the {} {} has been created'.format(self.perm, type, self.name))
+        print('The permission {} for the {} {} has been created'.format(self.perm, self.type, self.name))
         return response
 
 
@@ -74,12 +78,11 @@ class GetEntityId(NotUndoable):
 
     def _do(self):
         entity_id = None
-        if type == 'group':
+        if self.type == 'group':
             entity_id = self.name
-        elif type == 'projectRole':
+        elif self.type == 'projectRole':
             entity_id = Roles.Get(self.name).do().get('id', None)
-            # entity_id = Roles.get(self.name).get('id', None)
-        elif type == 'user':
+        elif self.type == 'user':
             entity_id = self.name
         return entity_id
 

@@ -1,6 +1,6 @@
 from openpyxl import Workbook
 
-from atlas import Projects, Users
+from atlas import Projects, Users, Permissions
 from excel import Widgets
 from scripts import Scripts, MultiProjects, Students
 from schema.yaml_loader import load
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     if i == 0:
         try:
             script = Students.import_students('students.csv', ['jira-users', 'Les poids lourds de l\'amour'])
-            script.revert()
+            # script.revert()
             # Scripts.remove_students('students.csv')
         except Exception as e:
             eprint(e)
@@ -28,10 +28,13 @@ if __name__ == '__main__':
 
         status = Widgets.IssuesStatus('ISLBD')
         types = Widgets.IssuesType('ISLBD')
+        pie = Widgets.Pie('ISLBD')
 
         status.write(ws, 'A1')
         types.write(ws, 'A1', offset_row=status.size[1] + 2)
-        types.write(ws, 'A1', offset_col=status.size[0] + 4)
+        # types.write(ws, 'A1', offset_col=types.size[0] + 1, offset_row=status.size[1] + 2)
+
+        pie.write(ws, 'A16')
 
         wb.save('ISLBD.xlsx')
     if i == 2:
@@ -41,8 +44,9 @@ if __name__ == '__main__':
     if i == 3:
         script = ReversibleRunner()
         try:
-            file = MultiProjects.load_multi_project('schema/ISL_script.yml', script)
-            script.revert()
+            MultiProjects.load_multi_project('schema/ISL_script.yml', script)
+            print("\nSuccess, now reverting")
+            # script.revert()
         except Exception as e:
             eprint(e)
             # raise(e)

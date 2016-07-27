@@ -1,9 +1,8 @@
 params:
   tag: ISL
   type: software
-  applink: false
   supervisors:
-    - mosser
+    - crowd
     - gc203248
   readers:
     - bk101086

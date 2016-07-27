@@ -1,7 +1,7 @@
 roots:
-  stash: http://134.59.130.155/bitbucket/
-  jira: http://134.59.130.155/jira/
-  crowd: http://134.59.130.155/crowd/
+  stash: https://sparks-vm25.i3s.unice.fr/bitbucket/
+  jira: https://sparks-vm25.i3s.unice.fr/jira/
+  crowd: https://sparks-vm25.i3s.unice.fr/crowd/
 
 credentials:
   username: crowd
