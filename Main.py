@@ -1,8 +1,9 @@
+import time
 from openpyxl import Workbook
 
-from atlas import Projects, Users, Permissions
+from atlas import Projects, Users, Permissions, Repos, Groups
 from excel import Widgets
-from scripts import Scripts, MultiProjects, Students
+from scripts import Scripts, MultiProjects, Students, MultiRepo
 from schema.yaml_loader import load
 from scripts.Scripts import ReversibleRunner
 from util.util import pp, eprint
@@ -13,7 +14,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 if __name__ == '__main__':
-    i = 3
+    i = 4
 
     if i == 0:
         try:
@@ -32,7 +33,6 @@ if __name__ == '__main__':
 
         status.write(ws, 'A1')
         types.write(ws, 'A1', offset_row=status.size[1] + 2)
-        # types.write(ws, 'A1', offset_col=types.size[0] + 1, offset_row=status.size[1] + 2)
 
         pie.write(ws, 'A16')
 
@@ -42,14 +42,19 @@ if __name__ == '__main__':
         Projects.DeleteJira('ISLAB').do(safe=True)
         Projects.DeleteJira('Cobblestone').do(safe=True)
     if i == 3:
-        script = ReversibleRunner()
         try:
-            MultiProjects.load_multi_project('schema/ISL_script.yml', script)
+            MultiProjects.load_multi_project('schema/ISL_script.yml')
             print("\nSuccess, now reverting")
             # script.revert()
         except Exception as e:
             eprint(e)
             # raise(e)
     if i == 4:
-        p = Projects.GetAllJira().do(safe=True)
-        pp(p)
+        script = None
+        try:
+            script = MultiRepo.load_multi_repo('schema/DEVINT_script.yml')
+            print('\nImport over, reverting')
+            script.revert()
+        except Exception as e:
+            eprint(e)
+            # raise e

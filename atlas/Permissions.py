@@ -30,13 +30,13 @@ class Create(Command):
 
 
 class Delete(NotUndoable):
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, scheme_name):
+        self.scheme_name = scheme_name
 
     def _do(self):
-        scheme = Get(self.name).do()
+        scheme = Get(self.scheme_name).do()
         req.delete('jira', 'permissionscheme/{}'.format(scheme['id']))
-        print('The permission {} has been deleted'.format(self.name))
+        print('The permission {} has been deleted'.format(self.scheme_name))
 
 
 class CreatePermission(NotUndoable):
@@ -106,7 +106,7 @@ class Get(NotUndoable):
         return match
 
 
-class AssignToProject(NotUndoable):
+class AssignToProject(Command):
     def __init__(self, project_key, scheme_name):
         self.project_key = project_key
         self.scheme_name = scheme_name
@@ -115,6 +115,9 @@ class AssignToProject(NotUndoable):
         scheme = Get(self.scheme_name).do()
         req.put('jira', 'project/{}/permissionscheme'.format(self.project_key), json={'id': scheme['id']})
         print('The scheme {} has been assigned to the project {}'.format(self.scheme_name, self.project_key))
+
+    def _undo(self):
+        AssignToProject(self.project_key, 'Default Permission Scheme').do()
 
 
 class GetAll(NotUndoable):

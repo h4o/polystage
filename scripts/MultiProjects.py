@@ -1,11 +1,12 @@
 from atlas import Projects, Permissions, Applinks, Roles, Repos
 from schema.yaml_loader import load
+from scripts import Scripts
 from scripts.Scripts import ReversibleRunner, NeverUndo
 from util.util import pp, eprint
 
 
 def load_multi_project_file(file_name):
-    file = load(file_name, 'schema/new_project_template.yml')
+    file = load(file_name, 'schema/multi_project_template.yml')
     params = file['params']
     params['type'] = params.get('type', 'software')
     params['readers'] = params.get('readers', [])
@@ -21,14 +22,13 @@ def load_multi_project_file(file_name):
     return file
 
 
-def load_multi_project(file_name, script=None):
+def load_multi_project(file_name):
     data = load_multi_project_file(file_name)
     params = data['params']
-    if script is None:
-        script = ReversibleRunner()
+    script = ReversibleRunner()
 
-    _create_roles(script)
-    _create_permissions(params['scheme_name'], script)
+    Scripts.create_roles(script)
+    _create_permissions(params, script)
 
     for p in data['projects']:
         _create_project(p, params, script)
@@ -56,19 +56,11 @@ def _create_project(project, params, script):
     script.do(Permissions.AssignToProject(project['key'], params['scheme_name']))
 
 
-def _create_roles(script):
-    roles = script.do(Roles.GetAll())
-    roles = [a['name'] for a in roles]
-
-    'developers' in roles or script.do(Roles.Create('developers'))
-    'supervisors' in roles or script.do(Roles.Create('supervisors'))
-    'readers' in roles or script.do(Roles.Create('readers'))
-
-
-def _create_permissions(scheme_name, script):
-    Permissions.Get(scheme_name).do(safe=True) or script.do(Permissions.Create(scheme_name))
+def _create_permissions(params, script):
+    Permissions.Get(params['scheme_name']).do(safe=True) or script.do(Permissions.Create(params['scheme_name']))
 
     with NeverUndo(script) as never_undo:
+        scheme_name = params['scheme_name']
         never_undo.do(Permissions.CreatePermission(scheme_name, 'projectRole', 'developers', 'BROWSE_PROJECTS'))
         never_undo.do(Permissions.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'BROWSE_PROJECTS'))
         never_undo.do(Permissions.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS'))

@@ -1,3 +1,4 @@
+from atlas import Roles
 from exceptions import Exceptions
 from util import eprint
 
@@ -24,17 +25,18 @@ class ReversibleRunner:
         try:
             result = command.do()
             if not never_undo:
-                self.history.insert(0, command)
+                self.history.append(command)
             return result
-        except Exceptions.RequestException as e:
+        except Exception as e:
             eprint('Failure:', e, '\nTrying to undo:')
             self.revert()
             # TODO: Create a more explicit exception
             raise Exception("Script failure")
 
     def revert(self):
-        for command in self.history:
-            command.undo(safe=True)
+        while self.history:
+            cmd = self.history.pop()
+            cmd.undo(safe=True)
 
 
 class NeverUndo:
@@ -47,3 +49,12 @@ class NeverUndo:
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.script.never_undo = False
+
+
+def create_roles(script):
+    roles = script.do(Roles.GetAll())
+    roles = [a['name'] for a in roles]
+
+    'developers' in roles or script.do(Roles.Create('developers'))
+    'supervisors' in roles or script.do(Roles.Create('supervisors'))
+    'readers' in roles or script.do(Roles.Create('readers'))

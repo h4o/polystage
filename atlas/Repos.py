@@ -47,17 +47,6 @@ class Delete(NotUndoable):
         print('The repository {} from the project {} has been deleted'.format(self.repo_name, self.project_key))
 
 
-class DeleteAll(NotUndoable):
-    def __init__(self, project_key):
-        self.project_key = project_key
-
-    def _do(self):
-        repos = GetAll(self.project_key).do()
-
-        for repo in repos:
-            Delete(self.project_key, repo['name'])
-
-
 class Get(NotUndoable):
     def __init__(self, project_key, repo_name):
         self.project_key = project_key

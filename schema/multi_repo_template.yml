@@ -1,0 +1,19 @@
+type: //rec
+required:
+  params:
+    type: //rec
+    required:
+      key: //str
+      supervisors: {type: //arr, contents: //str, length: {min: 1}}
+    optional:
+      name: //str
+      readers: {type: //arr, contents: //str, length: {min: 1}}
+      type: //str
+  repos:
+    type: //arr
+    contents:
+      type: //rec
+      required:
+        name: //str
+        developers: {type: //arr, contents: //str}
+
