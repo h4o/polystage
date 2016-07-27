@@ -1,4 +1,5 @@
-from atlas import Projects, Users, Repos, Permissions
+from atlas import Projects, Users, Repos, PermScheme, BitbucketPerm
+from atlas.BitbucketPerm import Permission
 from schema.yaml_loader import load
 from scripts import Scripts
 from scripts.Scripts import ReversibleRunner, NeverUndo
@@ -50,11 +51,14 @@ def _create_repos(params, repos, script):
 
 def _create_permissions(params, script):
     scheme_name = params['scheme_name']
-    Permissions.Get(scheme_name).do(safe=True) or script.do(Permissions.Create(scheme_name))
+    script.do(PermScheme.Create(scheme_name))
+    script.do(PermScheme.AssignToProject(params['key'], scheme_name))
 
     with NeverUndo(script) as never_undo:
-        never_undo.do(Permissions.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'BROWSE_PROJECTS'))
-        never_undo.do(Permissions.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS'))
+        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'BROWSE_PROJECTS'))
+        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS'))
 
-    # TODO Bitbucket permissions
-    script.do(Permissions.AssignToProject(params['key'], scheme_name))
+        for supervisor in params['supervisors']:
+            never_undo.do(BitbucketPerm.GrantPermission(params['key'], supervisor, Permission.ADMIN))
+        for developer in params['developers']:
+            never_undo.do(BitbucketPerm.GrantPermission(params['key'], developer, Permission.WRITE))

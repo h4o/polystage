@@ -1,7 +1,8 @@
 import time
 from openpyxl import Workbook
 
-from atlas import Projects, Users, Permissions, Repos, Groups
+from atlas import Projects, Users, PermScheme, Repos, Groups
+from atlas.BitbucketPerm import Permission
 from excel import Widgets
 from scripts import Scripts, MultiProjects, Students, MultiRepo
 from schema.yaml_loader import load
@@ -14,7 +15,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 if __name__ == '__main__':
-    i = 4
+    i = 3
 
     if i == 0:
         try:
@@ -45,7 +46,6 @@ if __name__ == '__main__':
         try:
             MultiProjects.load_multi_project('schema/ISL_script.yml')
             print("\nSuccess, now reverting")
-            # script.revert()
         except Exception as e:
             eprint(e)
             # raise(e)

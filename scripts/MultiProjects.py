@@ -1,4 +1,5 @@
-from atlas import Projects, Permissions, Applinks, Roles, Repos
+from atlas import Projects, PermScheme, Applinks, Roles, Repos, BitbucketPerm
+from atlas.BitbucketPerm import Permission
 from schema.yaml_loader import load
 from scripts import Scripts
 from scripts.Scripts import ReversibleRunner, NeverUndo
@@ -43,24 +44,27 @@ def _create_project(project, params, script):
     with NeverUndo(script) as never_undo:
         if params['applink']:
             never_undo.do(Applinks.Link(project['key'], project['key']))
-        for developer in project['developers']:
-            never_undo.do(Projects.AddWithRole(project['key'], developer, 'developers'))
         for supervisor in project['supervisors']:
             never_undo.do(Projects.AddWithRole(project['key'], supervisor, 'supervisors'))
+            never_undo.do(BitbucketPerm.GrantPermission(project['key'], supervisor, Permission.ADMIN))
+        for developer in project['developers']:
+            never_undo.do(Projects.AddWithRole(project['key'], developer, 'developers'))
+            never_undo.do(BitbucketPerm.GrantPermission(project['key'], developer, Permission.WRITE))
         for reader in project['readers']:
             never_undo.do(Projects.AddWithRole(project['key'], reader, 'readers'))
+            never_undo.do(BitbucketPerm.GrantPermission(project['key'], reader, Permission.READ))
 
     for repo in params['repositories']:
         script.do(Repos.Create(project['key'], repo))
 
-    script.do(Permissions.AssignToProject(project['key'], params['scheme_name']))
+    script.do(PermScheme.AssignToProject(project['key'], params['scheme_name']))
 
 
 def _create_permissions(params, script):
-    Permissions.Get(params['scheme_name']).do(safe=True) or script.do(Permissions.Create(params['scheme_name']))
+    script.do(PermScheme.Create(params['scheme_name']))
 
     with NeverUndo(script) as never_undo:
         scheme_name = params['scheme_name']
-        never_undo.do(Permissions.CreatePermission(scheme_name, 'projectRole', 'developers', 'BROWSE_PROJECTS'))
-        never_undo.do(Permissions.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'BROWSE_PROJECTS'))
-        never_undo.do(Permissions.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS'))
+        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'developers', 'BROWSE_PROJECTS'))
+        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'BROWSE_PROJECTS'))
+        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS'))

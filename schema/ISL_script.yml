@@ -1,5 +1,5 @@
 params:
-  tag: ISL
+  tag: ABC
   type: software
   supervisors:
     - crowd
@@ -10,7 +10,6 @@ params:
     - private
 projects:
   - id: AA
-    name: Cobblestone
     developers: [ln404361, fl407746, jl201213, nn200057]
   - id: AB
     developers: [sl200103, st405262, nc201038, wq105385]
