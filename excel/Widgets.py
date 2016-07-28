@@ -8,13 +8,14 @@ from openpyxl import Workbook
 from openpyxl.utils import coordinate_from_string, column_index_from_string, rows_from_range, coordinate_to_tuple, \
     get_column_letter
 
+from util.util import pp
+
 
 class Widget(ABC):
     def write(self, worksheet, cell='A1', offset_col=0, offset_row=0):
         row, col = coordinate_to_tuple(cell)
         cell = get_column_letter(col + offset_col) + str(row + offset_row)
 
-        self._fetch()
         self._write(worksheet, cell)
 
     @abstractmethod
@@ -22,7 +23,7 @@ class Widget(ABC):
         pass
 
     @abstractmethod
-    def _fetch(self):
+    def update(self):
         pass
 
     @property
@@ -74,7 +75,7 @@ class Pie(Table):
         pie.title = "Issues"
         worksheet.add_chart(pie, cell)
 
-    def _fetch(self):
+    def update(self):
         issues = Projects.GetIssues(self.project_key).do()
         data = {}
         for issue in issues:
@@ -96,7 +97,7 @@ class IssuesStatus(Table):
         super().__init__()
         self.project_key = project_key
 
-    def _fetch(self):
+    def update(self):
         issues = Projects.GetIssues(self.project_key).do()
         data = {}
         for issue in issues:
@@ -123,7 +124,7 @@ class IssuesType(Table):
         super().__init__()
         self.project_key = project_key
 
-    def _fetch(self):
+    def update(self):
         issues = Projects.GetIssues(self.project_key).do()
         result = [a for a in Projects.GetIssueTypes().do() if a['name'] in self.types]
         issue_types = {}

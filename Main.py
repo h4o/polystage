@@ -3,6 +3,7 @@ from openpyxl import Workbook
 
 from atlas import Projects, Users, PermScheme, Repos, Groups
 from atlas.BitbucketPerm import Permission
+from atlas.ExcelScript import IssueStats
 from excel import Widgets
 from requester import Requester
 from requester.Requester import CredType, req
@@ -58,10 +59,16 @@ def excel():
     wb.save('ISLBD.xlsx')
 
 
+def test_get_flag():
+    i = IssueStats('ISL')
+    i.generate('Stats.xlsx')
+
+
 if __name__ == '__main__':
     # func = lambda: import_students()
-    func = lambda: multi_project()
+    # func = lambda: multi_project()
     # func = lambda: multi_repos()
     # func = lambda: excel()
+    func = lambda: test_get_flag()
 
     func()

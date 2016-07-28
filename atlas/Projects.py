@@ -1,6 +1,7 @@
 from atlas import Roles
 from atlas.Command import NotUndoable, Command
 from requester.Requester import req, rest_request
+from util.util import pp
 
 
 class AddWithRole(NotUndoable):
@@ -164,3 +165,13 @@ class GetIssues(NotUndoable):
 class GetIssueTypes(NotUndoable):
     def _do(self):
         return req.get('jira', 'issuetype')
+
+
+class GetFromTag(NotUndoable):
+    def __init__(self, tag):
+        self.tag = tag
+
+    def _do(self):
+        projects = GetAllJira().do()
+        projects = [a for a in projects if a['key'].startswith(self.tag)]
+        return projects
