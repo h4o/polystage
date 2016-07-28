@@ -66,7 +66,7 @@ class CreatePermission(NotUndoable):
             'permission': self.perm.upper()
         }
         response = req.post('jira', 'permissionscheme/{}/permission'.format(scheme['id']), json=json,
-                            params={'expand': 'group'}, errors=errors)
+                            errors=errors)
         print('The permission {} for the {} {} has been created'.format(self.perm, self.type, self.name))
         return response
 

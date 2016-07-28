@@ -1,7 +1,7 @@
 import csv
 from atlas import Users, Groups
 from atlas.User import Student
-from scripts.Scripts import ReversibleRunner
+from scripts.Runner import ReversibleRunner
 
 
 def load_students(user_file):

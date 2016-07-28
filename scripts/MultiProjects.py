@@ -1,8 +1,8 @@
 from atlas import Projects, PermScheme, Applinks, Roles, Repos, BitbucketPerm
 from atlas.BitbucketPerm import Permission
 from schema.yaml_loader import load
-from scripts import Scripts
-from scripts.Scripts import ReversibleRunner, NeverUndo
+from scripts import Runner
+from scripts.Runner import ReversibleRunner, NeverUndo
 from util.util import pp, eprint
 
 
@@ -28,7 +28,7 @@ def load_multi_project(file_name):
     params = data['params']
     script = ReversibleRunner()
 
-    Scripts.create_roles(script)
+    Runner.create_roles(script)
     _create_permissions(params, script)
 
     for p in data['projects']:

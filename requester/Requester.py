@@ -7,6 +7,11 @@ from schema import yaml_loader
 from util import eprint
 
 
+class CredType:
+    fab = 'requester/cred_server.yml'
+    polytech = 'requester/poly_IGNORE.yml'
+
+
 def rest_request(func):
     def wrapper(*args, **kwargs):
 
@@ -63,11 +68,11 @@ class Requester:
         if method == 'get':
             resp, data = self._get_rec(request, 0, params=params, auth=auth, headers=accept_json)
         elif method == 'post':
-            resp = self.s.post(request, json=json, params=params, auth=auth, headers=accept_json, verify=False,)
+            resp = self.s.post(request, json=json, params=params, auth=auth, headers=accept_json, verify=False, )
         elif method == 'put':
-            resp = self.s.put(request, json=json, params=params, auth=auth, headers=accept_json, verify=False,)
+            resp = self.s.put(request, json=json, params=params, auth=auth, headers=accept_json, verify=False, )
         elif method == 'delete':
-            resp = self.s.delete(request, json=json, params=params, auth=auth, headers=accept_json, verify=False,)
+            resp = self.s.delete(request, json=json, params=params, auth=auth, headers=accept_json, verify=False, )
 
         try:
             data = data or resp.json()
@@ -111,5 +116,5 @@ class Requester:
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
-req = Requester('requester/cred_server.yml')
-# req = Requester('requester/poly_IGNORE.yml')
+req = Requester(CredType.fab)
+# req = Requester(CredType.polytech)

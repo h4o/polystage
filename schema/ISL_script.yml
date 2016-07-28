@@ -1,5 +1,5 @@
 params:
-  tag: ABC
+  tag: POG
   type: software
   supervisors:
     - crowd
@@ -9,8 +9,8 @@ params:
   repositories:
     - private
 projects:
-  - id: AA
+  - id: PF
     developers: [ln404361, fl407746, jl201213, nn200057]
-  - id: AB
+  - id: ZZ
     developers: [sl200103, st405262, nc201038, wq105385]
     supervisors: [ct106586]
