@@ -58,9 +58,8 @@ class Table(Widget):
 
 
 class Pie(Table):
-    def __init__(self, project_key):
+    def __init__(self):
         super().__init__()
-        self.project_key = project_key
 
     def _write(self, worksheet, cell):
         super(Pie, self)._write(worksheet, cell)
@@ -74,22 +73,6 @@ class Pie(Table):
         pie.set_categories(labels)
         pie.title = "Issues"
         worksheet.add_chart(pie, cell)
-
-    def update(self):
-        issues = Projects.GetIssues(self.project_key).do()
-        data = {}
-        for issue in issues:
-            fields = issue['fields']
-            resolution = fields['resolution']
-            resolution = 'Open' if resolution is None else fields['status']['name']
-
-            if resolution not in data:
-                data[resolution] = 0
-            data[resolution] += 1
-
-        self.header = ['Key', 'Values']
-        for k, v in data.items():
-            self.append(k, v)
 
 
 class IssuesStatus(Table):
@@ -151,3 +134,25 @@ class IssuesType(Table):
             for type_field in self.types:
                 values.append(t.get(type_field, 0))
             self.append(*values)
+
+
+class IssuesStatusPie(Pie):
+    def __init__(self, project_key):
+        super().__init__()
+        self.project_key = project_key
+
+    def update(self):
+        issues = Projects.GetIssues(self.project_key).do()
+        data = {}
+        for issue in issues:
+            fields = issue['fields']
+            resolution = fields['resolution']
+            resolution = 'Open' if resolution is None else fields['status']['name']
+
+            if resolution not in data:
+                data[resolution] = 0
+            data[resolution] += 1
+
+        self.header = ['Key', 'Values']
+        for k, v in data.items():
+            self.append(k, v)

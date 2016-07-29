@@ -72,9 +72,9 @@ class IssueStats(ExcelScript):
             ws = self.new_sheet(project['key'])
             self.put(Widgets.IssuesStatus(project['key']), ws)
             self.put(Widgets.IssuesType(project['key']), ws, col=2)
-            self.put(Widgets.Pie(project['key']), ws, col=1)
-            self.put(Widgets.Pie(project['key']), ws, col=2)
-            self.put(Widgets.Pie(project['key']), ws, col=3)
+            self.put(Widgets.IssuesStatusPie(project['key']), ws, col=1)
+            self.put(Widgets.IssuesStatusPie(project['key']), ws, col=2)
+            self.put(Widgets.IssuesStatusPie(project['key']), ws, col=3)
 
             ws2 = self.new_sheet('Yayayaya')
             self.put(Widgets.IssuesStatus(project['key']), ws2)

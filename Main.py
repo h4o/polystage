@@ -59,7 +59,7 @@ def excel():
     wb.save('ISLBD.xlsx')
 
 
-def test_get_flag():
+def excel_script():
     i = IssueStats('ISL')
     i.generate('Stats.xlsx')
 
@@ -69,6 +69,6 @@ if __name__ == '__main__':
     # func = lambda: multi_project()
     # func = lambda: multi_repos()
     # func = lambda: excel()
-    func = lambda: test_get_flag()
+    func = lambda: excel_script()
 
     func()
