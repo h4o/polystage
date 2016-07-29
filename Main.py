@@ -1,3 +1,4 @@
+import json
 import time
 from openpyxl import Workbook
 
@@ -29,6 +30,7 @@ def multi_project():
     try:
         script = MultiProjects.load_multi_project('schema/ISL_script.yml')
         print("\nSuccess, now reverting")
+        time.sleep(10)
         script.revert()
     except Exception as e:
         eprint(e)
@@ -49,7 +51,7 @@ def excel():
 
     status = Widgets.IssuesStatus('ISLBD')
     types = Widgets.IssuesType('ISLBD')
-    pie = Widgets.Pie('ISLBD')
+    pie = Widgets.PieChart('ISLBD')
 
     status.write(ws, 'A1')
     types.write(ws, 'A1', offset_row=status.size[1] + 2)
@@ -64,11 +66,27 @@ def excel_script():
     i.generate('Stats.xlsx')
 
 
+def try_smthing():
+    # p = Projects.GetJira('PFE').do()
+    # p = Projects.GetJira('PFEAL').do()
+    # c = Projects.CreateCategory('Blabadoo').do()
+    # pp(c)
+    # pp(p)
+    # print(json.dumps(p))
+    # p = Projects.GetCategory('POG').do()
+
+    # Projects.CreateCategory('TEST').do()
+    # Projects.CreateJira('TESTAA', 'TESTAA', 'crowd', category='TEST').do(safe=True)
+    Projects.DeleteJira('TESTAA').do(safe=True)
+    # Projects.DeleteCategory('TEST').do()
+
+
 if __name__ == '__main__':
     # func = lambda: import_students()
-    # func = lambda: multi_project()
+    func = lambda: multi_project()
     # func = lambda: multi_repos()
     # func = lambda: excel()
-    func = lambda: excel_script()
+    # func = lambda: excel_script()
+    # func = lambda: try_smthing()
 
     func()

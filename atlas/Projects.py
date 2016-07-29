@@ -27,24 +27,28 @@ class AddWithRole(NotUndoable):
 
 
 class CreateJira(Command):
-    def __init__(self, key, name, lead, description='', project_type='business'):
+    def __init__(self, key, name, lead, description='', project_type='business', category=''):
         self.key = key
         self.name = name
         self.lead = lead
         self.description = description
         self.project_type = project_type
+        self.category = category
 
     def _do(self):
+        """The key must be in uppercase, and its length in [2,10]
         """
-        The key must be in uppercase, and its length in [2,10]
-        """
+        cate = GetCategory(self.category).do()
+        cate_id = -1 if cate is None else cate['id']
         project = {
             'key': self.key,
             'name': self.name,
             'projectTypeKey': self.project_type,
             'description': self.description,
-            'lead': self.lead
+            'lead': self.lead,
         }
+        if cate is not None:
+            project['categoryId'] = cate_id
         errors = {
             'message': 'Could not create jira project {}'.format(self.key),
             'reasons': {
@@ -183,3 +187,56 @@ class GetFromTag(NotUndoable):
         projects = GetAllJira().do()
         projects = [a for a in projects if a['key'].startswith(self.tag)]
         return projects
+
+
+class CreateCategory(Command):
+    def __init__(self, cate_name, description='unspecified'):
+        self.cate_name = cate_name
+        self.description = description
+
+    def _do(self):
+        errors = {
+            'message': 'Could not create category {}'.format(self.cate_name),
+            'reasons': {
+                409: 'A category with the given name already exists'
+            }
+        }
+        json = {
+            'name': self.cate_name,
+            'description': self.description
+        }
+        category = req.post('jira', 'projectCategory', json=json, errors=errors)
+        print('The category {} has been created'.format(self.cate_name))
+        return category
+
+    def _undo(self):
+        DeleteCategory(self.cate_name).do()
+
+
+class GetCategory(NotUndoable):
+    def __init__(self, cate_name):
+        self.cate_name = cate_name
+
+    def _do(self):
+        categories = req.get('jira', 'projectCategory')
+        category = [i for i in categories if i['name'] == self.cate_name]
+        if not category:
+            return None
+        return category[0]
+
+
+class DeleteCategory(NotUndoable):
+    def __init__(self, cate_name):
+        self.cate_name = cate_name
+
+    def _do(self):
+        cate = GetCategory(self.cate_name).do()
+        errors = {
+            'message': 'Could not delete the category {}'.format(self.cate_name),
+            'reasons': {
+                404: 'The category could not be found',
+            }
+        }
+        cate_id = -1 if cate is None else cate['id']
+        req.delete('jira', 'projectCategory/{}'.format(cate_id), errors=errors)
+        print('The category {} has been deleted'.format(self.cate_name))

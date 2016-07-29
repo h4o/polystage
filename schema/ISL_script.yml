@@ -1,5 +1,5 @@
 params:
-  tag: POG
+  tag: ISL
   type: software
   supervisors:
     - crowd

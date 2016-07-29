@@ -30,6 +30,7 @@ def load_multi_project(file_name):
 
     Runner.create_roles(script)
     _create_permissions(params, script)
+    script.do(Projects.CreateCategory(params['tag']))
 
     for p in data['projects']:
         _create_project(p, params, script)
@@ -38,7 +39,8 @@ def load_multi_project(file_name):
 
 
 def _create_project(project, params, script):
-    script.do(Projects.CreateJira(project['key'], project['name'], project['lead'], project_type=params['type']))
+    script.do(Projects.CreateJira(project['key'], project['name'], project['lead'], project_type=params['type'],
+                                  category=params['tag']))
     script.do(Projects.CreateBitbucket(project['key'], project['name']))
 
     with NeverUndo(script) as never_undo:

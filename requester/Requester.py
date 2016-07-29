@@ -116,5 +116,5 @@ class Requester:
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
-# req = Requester(CredType.fab)
-req = Requester(CredType.polytech)
+req = Requester(CredType.fab)
+# req = Requester(CredType.polytech)
