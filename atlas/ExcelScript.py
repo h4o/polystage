@@ -50,14 +50,14 @@ class ExcelScript:
             widget['widget'].update()
             cols_sizes[widget['col']] = cols_sizes.get(widget['col'], [])
             cols_sizes[widget['col']].append(widget['widget'].size[0])
-
+        offsets = [0]
         for col, val in cols_sizes.items():
-            cols_sizes[col] = max(val) + 5
-            starting_col = cols_sizes.get(col - 1, 0)
+            offsets.append(offsets[-1] + max(val) + 1)
+        for col, offset_col in enumerate(offsets):
             offset_row = 0
-            for widget in [w for w in wid_list if w['col'] == col]:
+            for widget in [w for w in wid_list if w['col'] == col+1]:
                 ws = self.wb[widget['worksheet']]
-                widget['widget'].write(ws, 'A1', offset_col=starting_col, offset_row=offset_row)
+                widget['widget'].write(ws, 'A1', offset_col=offset_col, offset_row=offset_row)
                 offset_row += widget['widget'].size[1] + 1
 
 
@@ -74,6 +74,7 @@ class IssueStats(ExcelScript):
             self.put(Widgets.IssuesType(project['key']), ws, col=2)
             self.put(Widgets.Pie(project['key']), ws, col=1)
             self.put(Widgets.Pie(project['key']), ws, col=2)
+            self.put(Widgets.Pie(project['key']), ws, col=3)
 
             ws2 = self.new_sheet('Yayayaya')
             self.put(Widgets.IssuesStatus(project['key']), ws2)
