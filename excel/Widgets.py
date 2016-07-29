@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 
+import itertools
 from openpyxl.chart import Reference, PieChart
 from openpyxl.chart.marker import DataPoint
 
@@ -156,3 +157,19 @@ class IssuesStatusPie(Pie):
         self.header = ['Key', 'Values']
         for k, v in data.items():
             self.append(k, v)
+
+
+class AssigneePie(Pie):
+    def __init__(self, project_key):
+        super().__init__()
+        self.project_key = project_key
+
+    def update(self):
+        self.header = ['osef', 'osef']
+        issues = Projects.GetIssues(self.project_key).do()
+        assigned = [i for i in issues if i['fields']['assignee'] is not None]
+        unassigned = [i for i in issues if i['fields']['assignee'] is None]
+        assigned = sorted(assigned, key=lambda x: x['fields']['assignee']['displayName'])
+        for k, g in itertools.groupby(assigned, lambda x: x['fields']['assignee']['displayName']):
+            self.append(k, len(list(g)))
+        self.append('unassigned', len(unassigned))

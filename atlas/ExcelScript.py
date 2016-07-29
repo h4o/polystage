@@ -55,7 +55,7 @@ class ExcelScript:
             offsets.append(offsets[-1] + max(val) + 1)
         for col, offset_col in enumerate(offsets):
             offset_row = 0
-            for widget in [w for w in wid_list if w['col'] == col+1]:
+            for widget in [w for w in wid_list if w['col'] == col + 1]:
                 ws = self.wb[widget['worksheet']]
                 widget['widget'].write(ws, 'A1', offset_col=offset_col, offset_row=offset_row)
                 offset_row += widget['widget'].size[1] + 1
@@ -71,12 +71,12 @@ class IssueStats(ExcelScript):
         for project in projects:
             ws = self.new_sheet(project['key'])
             self.put(Widgets.IssuesStatus(project['key']), ws)
-            self.put(Widgets.IssuesType(project['key']), ws, col=2)
-            self.put(Widgets.IssuesStatusPie(project['key']), ws, col=1)
+            self.put(Widgets.IssuesType(project['key']), ws)
             self.put(Widgets.IssuesStatusPie(project['key']), ws, col=2)
-            self.put(Widgets.IssuesStatusPie(project['key']), ws, col=3)
+            self.put(Widgets.AssigneePie(project['key']), ws, col=2)
 
             ws2 = self.new_sheet('Yayayaya')
             self.put(Widgets.IssuesStatus(project['key']), ws2)
-            self.put(Widgets.IssuesStatus(project['key']), ws2)
-            self.put(Widgets.IssuesStatus(project['key']), ws2)
+            self.put(Widgets.IssuesType(project['key']), ws2)
+            self.put(Widgets.IssuesStatusPie(project['key']), ws2, col=2)
+            self.put(Widgets.AssigneePie(project['key']), ws2, col=2)
