@@ -39,7 +39,7 @@ def multi_repos():
     try:
         script = MultiRepo.load_multi_repo('schema/DEVINT_script.yml')
         print('\nImport over, reverting')
-        script.revert()
+        # script.revert()
     except Exception as e:
         eprint(e)
 
@@ -84,9 +84,9 @@ def try_smthing():
 if __name__ == '__main__':
     # func = lambda: import_students()
     # func = lambda: multi_project()
-    # func = lambda: multi_repos()
+    func = lambda: multi_repos()
     # func = lambda: excel()
     # func = lambda: excel_script()
-    func = lambda: try_smthing()
+    # func = lambda: try_smthing()
 
     func()

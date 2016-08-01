@@ -3,6 +3,7 @@ from atlas.BitbucketPerm import Permission
 from schema.yaml_loader import load
 from scripts import Runner
 from scripts.Runner import ReversibleRunner, NeverUndo
+from scripts.Util import create_basic_roles, grant_jira_perms, grant_bitbucket_perms, add_users_to_project
 from util.util import pp
 
 
@@ -24,10 +25,10 @@ def load_multi_repo(file_name):
     params, repos = data['params'], data['repos']
     script = ReversibleRunner()
 
-    Runner.create_roles(script)
+    create_basic_roles(script)
 
     _create_project(params, script)
-    _add_dev_to_project(params, script)
+    _add_users_to_project(params, script)
     _create_repos(params, repos, script)
     _create_permissions(params, script)
 
@@ -39,9 +40,10 @@ def _create_project(params, script):
     script.do(Projects.CreateBitbucket(params['key'], params['name']))
 
 
-def _add_dev_to_project(params, script):
-    for user in params['developers']:
-        script.do(Projects.AddWithRole(params['key'], user, 'developers'), never_undo=True)
+def _add_users_to_project(params, script):
+    with NeverUndo(script) as never_undo:
+        add_users_to_project(params['key'], never_undo, readers=params['readers'], developers=params['developers'],
+                             supervisors=params['supervisors'])
 
 
 def _create_repos(params, repos, script):
@@ -55,10 +57,9 @@ def _create_permissions(params, script):
     script.do(PermScheme.AssignToProject(params['key'], scheme_name))
 
     with NeverUndo(script) as never_undo:
-        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'BROWSE_PROJECTS'))
-        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS'))
-
-        for supervisor in params['supervisors']:
-            never_undo.do(BitbucketPerm.GrantPermission(params['key'], supervisor, Permission.ADMIN))
-        for developer in params['developers']:
-            never_undo.do(BitbucketPerm.GrantPermission(params['key'], developer, Permission.WRITE))
+        grant_jira_perms(scheme_name, 'projectRole', 'supervisors', ['BROWSE_PROJECTS', 'ADMINISTER_PROJECTS'],
+                         never_undo)
+        grant_bitbucket_perms(params['key'], never_undo,
+                              readers=params['readers'],
+                              writers=params['developers'],
+                              admins=params['supervisors'])

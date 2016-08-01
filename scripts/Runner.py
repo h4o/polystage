@@ -50,11 +50,3 @@ class NeverUndo:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.script.never_undo = False
 
-
-def create_roles(script):
-    roles = script.do(Roles.GetAll())
-    roles = [a['name'] for a in roles]
-
-    'developers' in roles or script.do(Roles.Create('developers'))
-    'supervisors' in roles or script.do(Roles.Create('supervisors'))
-    'readers' in roles or script.do(Roles.Create('readers'))

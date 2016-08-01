@@ -3,6 +3,7 @@ from atlas.BitbucketPerm import Permission
 from schema.yaml_loader import load
 from scripts import Runner
 from scripts.Runner import ReversibleRunner, NeverUndo
+from scripts.Util import create_basic_roles, grant_bitbucket_perms, grant_jira_perms, add_users_to_project
 from util.util import pp, eprint
 
 
@@ -28,7 +29,7 @@ def load_multi_project(file_name):
     params = data['params']
     script = ReversibleRunner()
 
-    Runner.create_roles(script)
+    create_basic_roles(script)
     _create_permissions(params, script)
     script.do(Projects.CreateCategory(params['tag']))
 
@@ -46,15 +47,10 @@ def _create_project(project, params, script):
     with NeverUndo(script) as never_undo:
         if params['applink']:
             never_undo.do(Applinks.Link(project['key'], project['key']))
-        for supervisor in project['supervisors']:
-            never_undo.do(Projects.AddWithRole(project['key'], supervisor, 'supervisors'))
-            never_undo.do(BitbucketPerm.GrantPermission(project['key'], supervisor, Permission.ADMIN))
-        for developer in project['developers']:
-            never_undo.do(Projects.AddWithRole(project['key'], developer, 'developers'))
-            never_undo.do(BitbucketPerm.GrantPermission(project['key'], developer, Permission.WRITE))
-        for reader in project['readers']:
-            never_undo.do(Projects.AddWithRole(project['key'], reader, 'readers'))
-            never_undo.do(BitbucketPerm.GrantPermission(project['key'], reader, Permission.READ))
+        add_users_to_project(project['key'], never_undo, readers=project['readers'], developers=project['developers'],
+                             supervisors=project['supervisors'])
+        grant_bitbucket_perms(project['key'], never_undo, readers=project['readers'], writers=project['developers'],
+                              admins=project['supervisors'])
 
     for repo in params['repositories']:
         script.do(Repos.Create(project['key'], repo))
@@ -67,6 +63,6 @@ def _create_permissions(params, script):
 
     with NeverUndo(script) as never_undo:
         scheme_name = params['scheme_name']
-        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'developers', 'BROWSE_PROJECTS'))
-        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'BROWSE_PROJECTS'))
-        never_undo.do(PermScheme.CreatePermission(scheme_name, 'projectRole', 'supervisors', 'ADMINISTER_PROJECTS'))
+        grant_jira_perms(scheme_name, 'projectRole', 'developers', ['BROWSE_PROJECTS'], never_undo)
+        grant_jira_perms(scheme_name, 'projectRole', 'supervisors', ['BROWSE_PROJECTS', 'ADMINISTER_PROJECTS'],
+                         never_undo)
