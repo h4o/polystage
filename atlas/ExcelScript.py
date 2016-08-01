@@ -2,6 +2,8 @@ from abc import abstractmethod
 
 from openpyxl import Workbook
 
+import excel.PieCharts
+import excel.Tables
 from atlas import Projects
 from excel import Widgets
 from util.util import pp
@@ -70,13 +72,8 @@ class IssueStats(ExcelScript):
         projects = Projects.GetFromTag(self.tag).do()
         for project in projects:
             ws = self.new_sheet(project['key'])
-            self.put(Widgets.IssuesStatus(project['key']), ws)
-            self.put(Widgets.IssuesType(project['key']), ws)
-            self.put(Widgets.IssuesStatusPie(project['key']), ws, col=2)
-            self.put(Widgets.AssigneePie(project['key']), ws, col=2)
-
-            ws2 = self.new_sheet('Yayayaya')
-            self.put(Widgets.IssuesStatus(project['key']), ws2)
-            self.put(Widgets.IssuesType(project['key']), ws2)
-            self.put(Widgets.IssuesStatusPie(project['key']), ws2, col=2)
-            self.put(Widgets.AssigneePie(project['key']), ws2, col=2)
+            self.put(excel.Tables.IssuesStatus(project['key']), ws)
+            self.put(excel.Tables.IssuesType(project['key']), ws)
+            self.put(excel.PieCharts.IssuesStatusPieChart(project['key']), ws, col=2)
+            self.put(excel.PieCharts.AssigneePieChart(project['key']), ws, col=2)
+            self.put(excel.PieCharts.CommitsPie(project['key'], 'private'), ws)

@@ -92,7 +92,7 @@ class Requester:
 
     def _get_rec(self, request, start, params=None, json=None, auth=None, headers=None):
         params = {} if params is None else params
-        params = {**params, **{'start': start}}
+        params = {**params, **{'start': start, 'limit': 1000}}
 
         response = self.s.get(request, params=params, json=json, auth=auth, verify=False,
                               headers=headers)
@@ -116,5 +116,5 @@ class Requester:
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
-req = Requester(CredType.fab)
-# req = Requester(CredType.polytech)
+# req = Requester(CredType.fab)
+req = Requester(CredType.polytech)

@@ -1,7 +1,10 @@
 import json
 import time
+from itertools import groupby
+
 from openpyxl import Workbook
 
+import excel.Tables
 from atlas import Projects, Users, PermScheme, Repos, Groups
 from atlas.BitbucketPerm import Permission
 from atlas.ExcelScript import IssueStats
@@ -44,49 +47,22 @@ def multi_repos():
         eprint(e)
 
 
-def excel():
-    wb = Workbook()
-    ws = wb.active
-
-    status = Widgets.IssuesStatus('ISLBD')
-    types = Widgets.IssuesType('ISLBD')
-    pie = Widgets.PieChart('ISLBD')
-
-    status.write(ws, 'A1')
-    types.write(ws, 'A1', offset_row=status.size[1] + 2)
-
-    pie.write(ws, 'A16')
-
-    wb.save('ISLBD.xlsx')
-
-
 def excel_script():
-    i = IssueStats('ISL')
+    i = IssueStats('SI3-OGL')
+    # i = IssueStats('ISL')
     i.generate('Stats.xlsx')
 
 
 def try_smthing():
-    # p = Projects.GetJira('PFE').do()
-    # p = Projects.GetJira('PFEAL').do()
-    # c = Projects.CreateCategory('Blabadoo').do()
-    # pp(c)
-    # pp(p)
-    # print(json.dumps(p))
-    # p = Projects.GetCategory('POG').do()
-
-    # Projects.CreateCategory('TEST').do()
-    # Projects.CreateJira('TESTAA', 'TESTAA', 'crowd', category='TEST').do(safe=True)
-    # Projects.DeleteJira('TESTAA').do(safe=True)
-    # Projects.DeleteCategory('TEST').do()
-    Projects.GetFromTag('ISL').do()
+    pass
 
 
 if __name__ == '__main__':
     # func = lambda: import_students()
     # func = lambda: multi_project()
-    func = lambda: multi_repos()
+    # func = lambda: multi_repos()
     # func = lambda: excel()
-    # func = lambda: excel_script()
+    func = lambda: excel_script()
     # func = lambda: try_smthing()
 
     func()
