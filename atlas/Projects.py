@@ -184,8 +184,8 @@ class GetFromTag(NotUndoable):
         self.tag = tag
 
     def _do(self):
-        projects = GetAllJira().do()
-        projects = [a for a in projects if a['key'].startswith(self.tag)]
+        project_list = GetAllJira().do()
+        projects = [a for a in project_list if 'projectCategory' in a and a['projectCategory']['name'] == self.tag]
         return projects
 
 

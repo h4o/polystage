@@ -30,8 +30,7 @@ def multi_project():
     try:
         script = MultiProjects.load_multi_project('schema/ISL_script.yml')
         print("\nSuccess, now reverting")
-        time.sleep(10)
-        script.revert()
+        # script.revert()
     except Exception as e:
         eprint(e)
 
@@ -77,16 +76,17 @@ def try_smthing():
 
     # Projects.CreateCategory('TEST').do()
     # Projects.CreateJira('TESTAA', 'TESTAA', 'crowd', category='TEST').do(safe=True)
-    Projects.DeleteJira('TESTAA').do(safe=True)
+    # Projects.DeleteJira('TESTAA').do(safe=True)
     # Projects.DeleteCategory('TEST').do()
+    Projects.GetFromTag('ISL').do()
 
 
 if __name__ == '__main__':
     # func = lambda: import_students()
-    func = lambda: multi_project()
+    # func = lambda: multi_project()
     # func = lambda: multi_repos()
     # func = lambda: excel()
     # func = lambda: excel_script()
-    # func = lambda: try_smthing()
+    func = lambda: try_smthing()
 
     func()
