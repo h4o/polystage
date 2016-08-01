@@ -48,8 +48,8 @@ def multi_repos():
 
 
 def excel_script():
-    i = IssueStats('SI3-OGL')
-    # i = IssueStats('ISL')
+    i = IssueStats('SI3-OGL', 'private')
+    # i = IssueStats('ISL', 'private')
     i.generate('Stats.xlsx')
 
 

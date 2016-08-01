@@ -2,6 +2,10 @@ from abc import ABC, abstractmethod
 
 from openpyxl import chart
 from openpyxl.chart import Reference
+from openpyxl.chart.label import DataLabelList
+from openpyxl.styles import Font, PatternFill
+from openpyxl.styles import Alignment
+from openpyxl.styles.colors import RED, WHITE, BLACK
 from openpyxl.utils import coordinate_to_tuple, get_column_letter
 
 
@@ -35,11 +39,20 @@ class Table(Widget):
         row, col = coordinate_to_tuple(cell)
         size_x, size_y = self.size
         rows = list(worksheet.get_squared_range(col, row, col + size_x - 1, row + size_y - 1))
+        font = Font(color=WHITE, bold=True)
+        head_fill = PatternFill(start_color=BLACK, end_color=BLACK, fill_type='solid')
         for i, header_cell in enumerate(rows[0]):
             header_cell.value = self.header[i]
+            header_cell.font = font
+            header_cell.fill = head_fill
+            header_cell.alignment = Alignment(horizontal='center')
+        colors = [WHITE, 'EAEAEA']
         for i, row in enumerate(rows[1:]):
             for j, c in enumerate(row):
+                color = colors[i % 2]
+                cell_fill = PatternFill(start_color=color, end_color=color, fill_type='solid')
                 c.value = self.rows[i][j]
+                c.fill = cell_fill
 
     def append(self, *args):
         self.rows.append(args)
@@ -63,6 +76,8 @@ class PieChart(Table):
         row, col = coordinate_to_tuple(cell)
 
         pie = chart.PieChart()
+        pie.dataLabels = DataLabelList()
+        pie.dataLabels.showVal = True
         labels = Reference(worksheet, min_col=col, min_row=row + 1, max_row=row + len(self.rows))
         data = Reference(worksheet, min_col=col + 1, min_row=row, max_row=row + len(self.rows))
         pie.add_data(data, titles_from_data=True)

@@ -27,7 +27,7 @@ class ExcelScript:
     def new_sheet(self, name):
         if self.nb_sheets == 0:
             ws = self.wb.active
-            ws.name = name
+            ws.title = name
         else:
             ws = self.wb.create_sheet(name)
 
@@ -64,8 +64,9 @@ class ExcelScript:
 
 
 class IssueStats(ExcelScript):
-    def __init__(self, project_tag):
+    def __init__(self, project_tag, repos_name):
         super().__init__()
+        self.repos_name = repos_name
         self.tag = project_tag
 
     def _generate(self):
@@ -76,4 +77,4 @@ class IssueStats(ExcelScript):
             self.put(excel.Tables.IssuesType(project['key']), ws)
             self.put(excel.PieCharts.IssuesStatusPieChart(project['key']), ws, col=2)
             self.put(excel.PieCharts.AssigneePieChart(project['key']), ws, col=2)
-            self.put(excel.PieCharts.CommitsPie(project['key'], 'private'), ws)
+            self.put(excel.PieCharts.CommitsPie(project['key'], self.repos_name), ws)
