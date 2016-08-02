@@ -32,16 +32,16 @@ def import_students():
 def multi_project():
     try:
         script = MultiProjects.load_multi_project('schema/ISL_script.yml')
-        print("\nSuccess, now reverting")
+        # print("\nSuccess, now reverting")
         # script.revert()
     except Exception as e:
         eprint(e)
 
 
-def multi_repos():
+def devint():
     try:
         script = MultiRepo.load_multi_repo('schema/DEVINT_script.yml')
-        print('\nImport over, reverting')
+        # print('\nImport over, reverting')
         # script.revert()
     except Exception as e:
         eprint(e)
@@ -54,15 +54,23 @@ def excel_script():
 
 
 def try_smthing():
-    pass
+    data = {
+        'ADMINISTER_PROJECTS': {
+            'projectRole': ['supervisors'],
+            'group': ['jira-administrators'],
+            'user': ['vf200724']},
+        'BROWSE_PROJECTS': {
+            'projectRole': ['readers', 'developers', 'supervisors']}}
+
+    PermScheme.UpdatePermissions('ISL_projects', data).do()
 
 
 if __name__ == '__main__':
     # func = lambda: import_students()
     # func = lambda: multi_project()
-    # func = lambda: multi_repos()
+    # func = lambda: devint()
     # func = lambda: excel()
-    func = lambda: excel_script()
-    # func = lambda: try_smthing()
+    # func = lambda: excel_script()
+    func = lambda: try_smthing()
 
     func()

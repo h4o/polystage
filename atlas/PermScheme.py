@@ -1,4 +1,4 @@
-from atlas import Roles
+from atlas import Roles, Users
 from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
 from requester.Requester import req, rest_request
@@ -39,7 +39,7 @@ class Delete(NotUndoable):
         print('The permission {} has been deleted'.format(self.scheme_name))
 
 
-class CreatePermission(NotUndoable):
+class GrantPermission(NotUndoable):
     def __init__(self, scheme_name, type, name, perm):
         self.scheme_name = scheme_name
         self.type = type
@@ -69,6 +69,46 @@ class CreatePermission(NotUndoable):
                             errors=errors)
         print('The permission {} for the {} {} has been created'.format(self.perm, self.type, self.name))
         return response
+
+
+class UpdatePermissions(NotUndoable):
+    def __init__(self, scheme_name, permissions, description=''):
+        """Permissions parameter must be a dict.
+        Ex:
+        {
+            'ADMINISTER_PROJECTS': {
+                'projectRole': ['supervisors'],
+                'group': ['jira-administrator']
+            },
+            'BROWSE_PROJECTS': {
+                'projectRole': ['readers', 'developers', 'supervisors'],
+                'user': ['hc202796']
+            }
+        }
+        """
+        self.scheme_name = scheme_name
+        self.perms = permissions
+        self.description = description
+
+    def _do(self):
+        scheme = Get(self.scheme_name).do()
+        perms = self.perms
+        permissions = [
+            {
+                'holder': {
+                    'type': e_type,
+                    'parameter': GetEntityId(e_type, entity).do()
+                },
+                'permission': perm
+            } for perm in perms for e_type in perms[perm] for entity in perms[perm][e_type]]
+
+        params = {
+            'name': self.scheme_name,
+            'permissions': permissions
+        }
+        if self.description != '':
+            params['description'] = self.description
+        req.put('jira', 'permissionscheme/{}'.format(scheme['id']), json=params)
 
 
 class GetEntityId(NotUndoable):

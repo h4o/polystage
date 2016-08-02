@@ -14,7 +14,7 @@ def create_basic_roles(script):
 
 def grant_jira_perms(scheme_name, entity_type, entity_name, permissions, script):
     for permission in permissions:
-        script.do(PermScheme.CreatePermission(scheme_name, entity_type, entity_name, permission))
+        script.do(PermScheme.GrantPermission(scheme_name, entity_type, entity_name, permission))
 
 
 def grant_bitbucket_perms(project_key, script, readers=None, writers=None, admins=None):

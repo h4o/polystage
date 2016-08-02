@@ -3,6 +3,7 @@ from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
 from requester.Requester import req, rest_request
 from util import eprint
+from util.util import pp
 
 
 class Create(Command):
@@ -40,6 +41,7 @@ class Remove(NotUndoable):
 
         req.delete('crowd', 'user', params={'username': self.user.username}, errors=errors)
         print('The user {} as been deleted'.format(self.user.display_name))
+
 
 class RemoveFromGroup(NotUndoable):
     def __init__(self, user, group):
@@ -82,3 +84,22 @@ class AddToGroup(Command):
 
     def _undo(self):
         RemoveFromGroup(self.username, self.group).do()
+
+
+class Get(NotUndoable):
+    def __init__(self, username):
+        self.username = username
+
+    def _do(self):
+        params = {
+            'username': self.username
+        }
+
+        errors = {
+            'message': 'Could not retrieve user {}'.format(self.username),
+            'reasons': {
+                404: 'The user could not be found'
+            }
+        }
+
+        return req.get('crowd', 'user', params=params, errors=errors)
