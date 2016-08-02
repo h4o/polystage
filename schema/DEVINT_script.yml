@@ -1,5 +1,5 @@
 params:
-  key: DEVINT
+  key: PANORAMIX
   supervisors: [pe202399]
   readers: [ln404361]
 repos:

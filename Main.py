@@ -67,10 +67,10 @@ def try_smthing():
 
 if __name__ == '__main__':
     # func = lambda: import_students()
-    # func = lambda: multi_project()
+    func = lambda: multi_project()
     # func = lambda: devint()
     # func = lambda: excel()
     # func = lambda: excel_script()
-    func = lambda: try_smthing()
+    # func = lambda: try_smthing()
 
     func()

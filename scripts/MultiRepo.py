@@ -57,8 +57,10 @@ def _create_permissions(params, script):
     script.do(PermScheme.AssignToProject(params['key'], scheme_name))
 
     with NeverUndo(script) as never_undo:
-        grant_jira_perms(scheme_name, 'projectRole', 'supervisors', ['BROWSE_PROJECTS', 'ADMINISTER_PROJECTS'],
-                         never_undo)
+        jira_perms = {
+            'BROWSE_PROJECTS': {
+                'projectRole': ['supervisors', 'developers']}}
+        never_undo.do(PermScheme.UpdatePermissions(scheme_name, jira_perms))
         grant_bitbucket_perms(params['key'], never_undo,
                               readers=params['readers'],
                               writers=params['developers'],

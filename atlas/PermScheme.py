@@ -109,6 +109,7 @@ class UpdatePermissions(NotUndoable):
         if self.description != '':
             params['description'] = self.description
         req.put('jira', 'permissionscheme/{}'.format(scheme['id']), json=params)
+        print('The permission scheme {} has been updated'.format(self.scheme_name))
 
 
 class GetEntityId(NotUndoable):

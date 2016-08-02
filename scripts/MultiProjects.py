@@ -63,6 +63,9 @@ def _create_permissions(params, script):
 
     with NeverUndo(script) as never_undo:
         scheme_name = params['scheme_name']
-        grant_jira_perms(scheme_name, 'projectRole', 'developers', ['BROWSE_PROJECTS'], never_undo)
-        grant_jira_perms(scheme_name, 'projectRole', 'supervisors', ['BROWSE_PROJECTS', 'ADMINISTER_PROJECTS'],
-                         never_undo)
+        permissions = {
+            'BROWSE_PROJECTS': {
+                'projectRole': ['developers', 'supervisors']},
+            'ADMINISTER_PROJECTS': {
+                'projectRole': ['developers']}}
+        never_undo.do(PermScheme.UpdatePermissions(scheme_name, permissions))
