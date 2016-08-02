@@ -24,7 +24,8 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def import_students():
     try:
-        script = Students.import_students('students.csv', ['jira-users', 'Les poids lourds de l\'amour'])
+        # script = Students.import_students('students.csv', ['jira-users', 'Les poids lourds de l\'amour'])
+        script = Students.import_students('import_user.yml')
     except Exception as e:
         print(e)
 

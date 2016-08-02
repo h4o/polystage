@@ -1,0 +1,4 @@
+type: //rec
+required:
+  csv_file: //str
+  groups: {type: //arr, length: {min: 1}}

@@ -1,5 +1,5 @@
 params:
-  tag: FAL
+  tag: SCHO
   type: software
   supervisors:
     - crowd
@@ -9,7 +9,7 @@ params:
   repositories:
     - private
 projects:
-  - id: BALA
+  - id: KOLAH
     developers: [ln404361, fl407746, jl201213, nn200057]
   - id: ZAR
     developers: [sl200103, st405262, nc201038, wq105385]

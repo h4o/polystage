@@ -66,6 +66,8 @@ def _create_permissions(params, script):
         permissions = {
             'BROWSE_PROJECTS': {
                 'projectRole': ['developers', 'supervisors']},
+            'CREATE_ISSUES': {
+                'projectRole': ['developers', 'supervisors']},
             'ADMINISTER_PROJECTS': {
                 'projectRole': ['developers']}}
         never_undo.do(PermScheme.UpdatePermissions(scheme_name, permissions))
