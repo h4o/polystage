@@ -1,6 +1,6 @@
 import yaml
 
-from schema import Rx
+from schema import rx
 
 
 def load(file_path, schema_path=None):
@@ -15,6 +15,6 @@ def load(file_path, schema_path=None):
 def _validate(file, schema_path):
     with open(schema_path) as schema_file:
         schema_yaml = yaml.safe_load(schema_file)
-        factory = Rx.Factory()
+        factory = rx.Factory()
         validator = factory.make_schema(schema_yaml)
         validator.validate(file)
