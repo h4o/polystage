@@ -2,6 +2,7 @@ import json
 import time
 from itertools import groupby
 
+import sys
 from openpyxl import Workbook
 
 import excel.Tables
@@ -24,8 +25,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 def import_students():
     try:
-        # script = Students.import_students('students.csv', ['jira-users', 'Les poids lourds de l\'amour'])
-        script = Students.import_students('import_user.yml')
+        script = Students.import_students('schema/import_user.yml')
     except Exception as e:
         print(e)
 
@@ -67,8 +67,8 @@ def try_smthing():
 
 
 if __name__ == '__main__':
-    # func = lambda: import_students()
-    func = lambda: multi_project()
+    func = lambda: import_students()
+    # func = lambda: multi_project()
     # func = lambda: devint()
     # func = lambda: excel()
     # func = lambda: excel_script()

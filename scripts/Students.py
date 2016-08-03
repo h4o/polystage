@@ -13,7 +13,7 @@ def load_students_file(user_file):
         for row in users_csv:
             user = Student(row)
             users.append(user)
-    return {users, config['groups']}
+    return {'users': users, 'groups': config['groups']}
 
 
 def remove_students(user_file):
@@ -25,7 +25,7 @@ def remove_students(user_file):
 def import_students(user_file):
     script = ReversibleRunner()
     data = load_students_file(user_file)
-    students, groups = data['students'], data['groups']
+    students, groups = data['users'], data['groups']
     group_names = script.do(Groups.GetAll())
     group_names = [group['name'] for group in group_names]
     for group in groups:
