@@ -55,23 +55,15 @@ def excel_script():
 
 
 def try_smthing():
-    data = {
-        'ADMINISTER_PROJECTS': {
-            'projectRole': ['supervisors'],
-            'group': ['jira-administrators'],
-            'user': ['vf200724']},
-        'BROWSE_PROJECTS': {
-            'projectRole': ['readers', 'developers', 'supervisors']}}
-
-    PermScheme.UpdatePermissions('ISL_projects', data).do()
+    print('It worked')
 
 
 if __name__ == '__main__':
-    func = lambda: import_students()
+    # func = lambda: import_students()
     # func = lambda: multi_project()
     # func = lambda: devint()
     # func = lambda: excel()
     # func = lambda: excel_script()
-    # func = lambda: try_smthing()
+    func = lambda: try_smthing()
 
     func()
