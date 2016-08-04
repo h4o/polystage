@@ -1,9 +1,7 @@
-from atlas import Roles, Users
+from atlas import Roles
 from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
-from requester.Requester import req, rest_request
-from util import eprint
-from util.util import pp
+from requester.Requester import Requester
 
 
 class Create(Command):
@@ -21,7 +19,7 @@ class Create(Command):
             'name': self.name
         }
 
-        scheme = req.post('jira', 'permissionscheme', json=json, errors=errors)
+        scheme = Requester.req.post('jira', 'permissionscheme', json=json, errors=errors)
         print('The permission scheme {} has been created'.format(self.name))
         return scheme
 
@@ -35,14 +33,14 @@ class Delete(NotUndoable):
 
     def _do(self):
         scheme = Get(self.scheme_name).do()
-        req.delete('jira', 'permissionscheme/{}'.format(scheme['id']))
+        Requester.req.delete('jira', 'permissionscheme/{}'.format(scheme['id']))
         print('The permission {} has been deleted'.format(self.scheme_name))
 
 
 class GrantPermission(NotUndoable):
-    def __init__(self, scheme_name, type, name, perm):
+    def __init__(self, scheme_name, e_type, name, perm):
         self.scheme_name = scheme_name
-        self.type = type
+        self.type = e_type
         self.name = name
         self.perm = perm
 
@@ -65,8 +63,8 @@ class GrantPermission(NotUndoable):
             },
             'permission': self.perm.upper()
         }
-        response = req.post('jira', 'permissionscheme/{}/permission'.format(scheme['id']), json=json,
-                            errors=errors)
+        response = Requester.req.post('jira', 'permissionscheme/{}/permission'.format(scheme['id']), json=json,
+                                      errors=errors)
         print('The permission {} for the {} {} has been created'.format(self.perm, self.type, self.name))
         return response
 
@@ -108,13 +106,13 @@ class UpdatePermissions(NotUndoable):
         }
         if self.description != '':
             params['description'] = self.description
-        req.put('jira', 'permissionscheme/{}'.format(scheme['id']), json=params)
+        Requester.req.put('jira', 'permissionscheme/{}'.format(scheme['id']), json=params)
         print('The permission scheme {} has been updated'.format(self.scheme_name))
 
 
 class GetEntityId(NotUndoable):
-    def __init__(self, type, name):
-        self.type = type
+    def __init__(self, e_type, name):
+        self.type = e_type
         self.name = name
 
     def _do(self):
@@ -154,7 +152,7 @@ class AssignToProject(Command):
 
     def _do(self):
         scheme = Get(self.scheme_name).do()
-        req.put('jira', 'project/{}/permissionscheme'.format(self.project_key), json={'id': scheme['id']})
+        Requester.req.put('jira', 'project/{}/permissionscheme'.format(self.project_key), json={'id': scheme['id']})
         print('The scheme {} has been assigned to the project {}'.format(self.scheme_name, self.project_key))
 
     def _undo(self):
@@ -163,5 +161,5 @@ class AssignToProject(Command):
 
 class GetAll(NotUndoable):
     def _do(self):
-        schemes = req.get('jira', 'permissionscheme')['permissionSchemes']
+        schemes = Requester.req.get('jira', 'permissionscheme')['permissionSchemes']
         return schemes

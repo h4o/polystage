@@ -1,7 +1,7 @@
 from atlas.Command import NotUndoable, Command
 from exceptions import Exceptions
-from requester.Requester import req, rest_request
-from util import eprint
+
+from requester.Requester import Requester
 
 
 class Create(Command):
@@ -24,7 +24,7 @@ class Create(Command):
             'forkable': self.forkable
         }
 
-        req.post('stash', 'projects/{}/repos'.format(self.project_key), json=json, errors=errors)
+        Requester.req.post('stash', 'projects/{}/repos'.format(self.project_key), json=json, errors=errors)
         print('The repository {} has been created'.format(self.name))
 
     def _undo(self):
@@ -43,7 +43,7 @@ class Delete(NotUndoable):
         repo_slug = repo.get('slug')
         if not repo_slug:
             raise Exceptions.RequestException(message, reason, None)
-        req.delete('stash', 'projects/{}/repos/{}'.format(self.project_key, repo_slug))
+        Requester.req.delete('stash', 'projects/{}/repos/{}'.format(self.project_key, repo_slug))
         print('The repository {} from the project {} has been deleted'.format(self.repo_name, self.project_key))
 
 
@@ -67,7 +67,7 @@ class GetAll(NotUndoable):
         self.project_key = project_key
 
     def _do(self):
-        return req.get('stash', 'projects/{}/repos'.format(self.project_key))['values']
+        return Requester.req.get('stash', 'projects/{}/repos'.format(self.project_key))['values']
 
 
 class GetCommits(NotUndoable):
@@ -83,5 +83,6 @@ class GetCommits(NotUndoable):
                 404: 'The repository does not exist'
             }
         }
-        result = req.get('stash', 'projects/{}/repos/{}/commits'.format(self.project_key, self.repo), errors=errors)
+        result = Requester.req.get('stash', 'projects/{}/repos/{}/commits'.format(self.project_key, self.repo),
+                                   errors=errors)
         return result['values']

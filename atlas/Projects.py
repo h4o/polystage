@@ -1,7 +1,7 @@
 from atlas import Roles
 from atlas.Command import NotUndoable, Command
-from requester.Requester import req, rest_request
-from util.util import pp
+
+from requester.Requester import Requester
 
 
 class AddWithRole(NotUndoable):
@@ -20,8 +20,8 @@ class AddWithRole(NotUndoable):
                 404: 'Either the group, the role or the project does not exist or the user is already in it'
             }
         }
-        req.post('jira', 'project/{}/role/{}'.format(self.project_key, role_id), json={'user': [self.user]},
-                 errors=errors)
+        Requester.req('jira', 'project/{}/role/{}'.format(self.project_key, role_id), json={'user': [self.user]},
+                      errors=errors)
         print('The user {} has been added to the project {} for the role {}'.format(self.user, self.project_key,
                                                                                     self.role_name))
 
@@ -55,7 +55,7 @@ class CreateJira(Command):
                 400: 'Invalid request. Leader unknown or the project already exists'
             }
         }
-        response = req.post('jira', 'project', json=project, errors=errors)
+        response = Requester.req.post('jira', 'project', json=project, errors=errors)
         print('The jira project {} has been created'.format(self.key))
         return response
 
@@ -82,7 +82,7 @@ class CreateBitbucket(Command):
                 409: 'The project key or name is already in use'
             }
         }
-        response = req.post('stash', 'projects', json=project, errors=errors)
+        response = Requester.req.post('stash', 'projects', json=project, errors=errors)
         print('The bitbucket project {} has been created'.format(self.key))
         return response
 
@@ -102,7 +102,7 @@ class DeleteJira(NotUndoable):
                 404: 'The project does not exist'
             }
         }
-        req.delete('jira', 'project/{}'.format(self.key), errors=errors)
+        Requester.req.delete('jira', 'project/{}'.format(self.key), errors=errors)
         print('The jira project {} has been deleted'.format(self.key))
 
 
@@ -119,7 +119,7 @@ class DeleteBitbucket(NotUndoable):
                 409: 'The project can not be deleted as it contains repositories',
             }
         }
-        req.delete('stash', 'projects/{}'.format(self.key), errors=errors)
+        Requester.req.delete('stash', 'projects/{}'.format(self.key), errors=errors)
         print('The bitbucket project {} has been deleted'.format(self.key))
 
 
@@ -135,7 +135,7 @@ class GetJira(NotUndoable):
                 404: 'Project not found'
             }
         }
-        return req.get('jira', 'project/{}'.format(key), errors=errors)
+        return Requester.req.get('jira', 'project/{}'.format(key), errors=errors)
 
 
 class GetBitbucket(NotUndoable):
@@ -150,12 +150,12 @@ class GetBitbucket(NotUndoable):
                 404: 'Project not found'
             }
         }
-        return req.get('stash', 'projects/{}'.format(key), errors=errors)
+        return Requester.req.get('stash', 'projects/{}'.format(key), errors=errors)
 
 
 class GetAllJira(NotUndoable):
     def _do(self):
-        return req.get('jira', 'project')
+        return Requester.req.get('jira', 'project')
 
 
 class GetIssues(NotUndoable):
@@ -170,13 +170,14 @@ class GetIssues(NotUndoable):
 
     def _do(self):
         if GetIssues.cache is None or self.force:
-            GetIssues.cache = req.get('jira', 'search?jql=project={}&maxResults=-1'.format(self.project_key))['issues']
+            GetIssues.cache = Requester.req.get('jira', 'search?jql=project={}&maxResults=-1'.format(self.project_key))[
+                'issues']
         return GetIssues.cache
 
 
 class GetIssueTypes(NotUndoable):
     def _do(self):
-        return req.get('jira', 'issuetype')
+        return Requester.req.get('jira', 'issuetype')
 
 
 class GetFromTag(NotUndoable):
@@ -205,7 +206,7 @@ class CreateCategory(Command):
             'name': self.cate_name,
             'description': self.description
         }
-        category = req.post('jira', 'projectCategory', json=json, errors=errors)
+        category = Requester.req.post('jira', 'projectCategory', json=json, errors=errors)
         print('The category {} has been created'.format(self.cate_name))
         return category
 
@@ -218,7 +219,7 @@ class GetCategory(NotUndoable):
         self.cate_name = cate_name
 
     def _do(self):
-        categories = req.get('jira', 'projectCategory')
+        categories = Requester.req.get('jira', 'projectCategory')
         category = [i for i in categories if i['name'] == self.cate_name]
         if not category:
             return None
@@ -238,5 +239,5 @@ class DeleteCategory(NotUndoable):
             }
         }
         cate_id = -1 if cate is None else cate['id']
-        req.delete('jira', 'projectCategory/{}'.format(cate_id), errors=errors)
+        Requester.req.delete('jira', 'projectCategory/{}'.format(cate_id), errors=errors)
         print('The category {} has been deleted'.format(self.cate_name))

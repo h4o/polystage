@@ -1,31 +1,19 @@
-import json
-import time
-from itertools import groupby
-
-import sys
-from openpyxl import Workbook
-
-import excel.Tables
-from atlas import Projects, Users, PermScheme, Repos, Groups
-from atlas.BitbucketPerm import Permission
-from atlas.ExcelScript import IssueStats
-from excel import Widgets
-from requester import Requester
-from requester.Requester import CredType, req
-from scripts import Runner, MultiProjects, Students, MultiRepo
-from schema.yaml_loader import load
-from scripts.Runner import ReversibleRunner
-from util.util import pp, eprint
-
 import requests
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
+from requester.Requester import Requester, CredType
+from scripts.atlas import MultiRepo, Students, MultiProjects
+from scripts.excel.ExcelScript import IssueStats
+from util.util import eprint
+from atlas import User, Roles, Applinks, BitbucketPerm, Command, Groups, PermScheme, Projects, Repos, Users
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+Requester.req = Requester(CredType.fab)
 
 def import_students():
     try:
-        script = Students.import_students('schema/import_user.yml')
+        script = Students.load_all()
     except Exception as e:
         print(e)
 
@@ -55,7 +43,8 @@ def excel_script():
 
 
 def try_smthing():
-    print('It worked')
+    # print(Requester.req)
+    Projects.CreateBitbucket('KEYKEY', 'NAMENAME').do()
 
 
 if __name__ == '__main__':

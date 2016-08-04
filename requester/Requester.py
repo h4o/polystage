@@ -12,23 +12,9 @@ class CredType:
     polytech = 'requester/poly_IGNORE.yml'
 
 
-def rest_request(func):
-    def wrapper(*args, **kwargs):
-
-        safe_run = kwargs.get('safe', False)
-        'safe' not in kwargs or kwargs.pop('safe')
-        if safe_run:
-            try:
-                return func(*args, **kwargs)
-            except Exceptions.RequestException as e:
-                eprint(e)
-        else:
-            return func(*args, **kwargs)
-
-    return wrapper
-
-
 class Requester:
+    req = None
+
     api = {
         'jira': 'rest/api/2/',
         'stash': 'rest/api/1.0/',
@@ -36,7 +22,7 @@ class Requester:
         'crowd': 'rest/usermanagement/1/'
     }
 
-    def __init__(self, cred_file='requester/credentials.yml'):
+    def __init__(self, cred_file='credentials.yml'):
         self.s = requests.Session()
         cred = yaml_loader.load(cred_file, 'schema/credential_schema.yml')
         self.roots = cred['roots']
@@ -116,5 +102,5 @@ class Requester:
         return self.crowd_auth if platform == 'crowd' else self.jira_auth
 
 
-req = Requester(CredType.fab)
-# req = Requester(CredType.polytech)
+if Requester.req is None:
+    Requester.req = Requester()

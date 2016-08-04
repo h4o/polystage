@@ -1,7 +1,6 @@
 from atlas.Command import NotUndoable, Command
-from exceptions import Exceptions
-from requester.Requester import req, rest_request
-from util import eprint
+
+from requester.Requester import Requester
 
 
 class GetAll(NotUndoable):
@@ -14,7 +13,7 @@ class GetAll(NotUndoable):
         }
         params = {'entity-type': 'group'}
 
-        return req.get('crowd', 'search', params=params, errors=errors)['groups']
+        return Requester.req.get('crowd', 'search', params=params, errors=errors)['groups']
 
 
 class Get(NotUndoable):
@@ -28,7 +27,7 @@ class Get(NotUndoable):
                 404: 'The group was not found'
             }
         }
-        return req.get('crowd', 'group', params={'groupname': self.groupname}, errors=errors)
+        return Requester.req.get('crowd', 'group', params={'groupname': self.groupname}, errors=errors)
 
 
 class Create(Command):
@@ -45,7 +44,7 @@ class Create(Command):
         }
 
         json = {'name': self.group, 'description': '', 'type': 'GROUP'}
-        req.post('crowd', 'group', json=json, errors=errors)
+        Requester.req.post('crowd', 'group', json=json, errors=errors)
         print('The group {} as been created'.format(self.group))
 
     def _undo(self):
@@ -64,5 +63,5 @@ class Delete(NotUndoable):
             }
         }
 
-        req.delete('crowd', 'group', params={'groupname': self.group}, errors=errors)
+        Requester.req.delete('crowd', 'group', params={'groupname': self.group}, errors=errors)
         print('The group {} has been deleted'.format(self.group))

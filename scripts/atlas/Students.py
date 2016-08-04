@@ -22,7 +22,7 @@ def remove_students(user_file):
         Users.Remove(student)
 
 
-def import_students(user_file):
+def load_all(user_file='schema/import_user.yml'):
     script = ReversibleRunner()
     data = load_students_file(user_file)
     students, groups = data['users'], data['groups']

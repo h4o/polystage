@@ -1,6 +1,5 @@
 from atlas.Command import NotUndoable
-from requester.Requester import req
-from enum import Enum
+from requester.Requester import Requester
 
 
 class Permission:
@@ -29,6 +28,7 @@ class GrantPermission(NotUndoable):
             'name': self.user_name,
             'permission': self.permission
         }
-        req.put('stash', 'projects/{}/permissions/users'.format(self.project_key), params=params, errors=errors)
+        Requester.req.put('stash', 'projects/{}/permissions/users'.format(self.project_key), params=params,
+                          errors=errors)
         print('The permission {} has been granted to user {} for project {}'.format(self.permission, self.user_name,
                                                                                     self.project_key))

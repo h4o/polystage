@@ -1,7 +1,5 @@
 from atlas.Command import NotUndoable, Command
-from exceptions import Exceptions
-from requester.Requester import req, rest_request
-from util import eprint
+from requester.Requester import Requester
 
 
 class Create(Command):
@@ -17,7 +15,8 @@ class Create(Command):
             }
         }
 
-        role = req.post('jira', 'role', json={'name': self.role_name, 'description': self.description}, errors=errors)
+        role = Requester.req.post('jira', 'role', json={'name': self.role_name, 'description': self.description},
+                                  errors=errors)
         print('The role {} has been created'.format(self.role_name))
         return role
 
@@ -55,7 +54,7 @@ class GetAll(NotUndoable):
             }
         }
 
-        return req.get('jira', 'role', errors=errors)
+        return Requester.req.get('jira', 'role', errors=errors)
 
 
 class Delete(NotUndoable):
@@ -73,6 +72,6 @@ class Delete(NotUndoable):
             }
         }
 
-        response = req.delete('jira', 'role/{}'.format(role_id), errors=errors)
+        response = Requester.req.delete('jira', 'role/{}'.format(role_id), errors=errors)
         print('The role {} has been deleted'.format(self.role_name))
         return response

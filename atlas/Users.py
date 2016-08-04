@@ -1,9 +1,5 @@
-from atlas import Groups
 from atlas.Command import NotUndoable, Command
-from exceptions import Exceptions
-from requester.Requester import req, rest_request
-from util import eprint
-from util.util import pp
+from requester.Requester import Requester
 
 
 class Create(Command):
@@ -19,7 +15,7 @@ class Create(Command):
             }
         }
 
-        req.post('crowd', 'user', json=self.user.get_crowd_format(), errors=errors)
+        Requester.req('crowd', 'user', json=self.user.get_crowd_format(), errors=errors)
         print('The user {} has been registered'.format(self.user.display_name))
 
     def _undo(self):
@@ -39,7 +35,7 @@ class Remove(NotUndoable):
             }
         }
 
-        req.delete('crowd', 'user', params={'username': self.user.username}, errors=errors)
+        Requester.req.delete('crowd', 'user', params={'username': self.user.username}, errors=errors)
         print('The user {} as been deleted'.format(self.user.display_name))
 
 
@@ -57,7 +53,7 @@ class RemoveFromGroup(NotUndoable):
             }
         }
         json = {'username': self.user, 'groupname': self.group}
-        req.delete('crowd', 'user/group/direct', json=json, errors=errors)
+        Requester.req.delete('crowd', 'user/group/direct', json=json, errors=errors)
         print('The user {} has been removed from the group {}'.format(self.user, self.group))
 
 
@@ -79,7 +75,7 @@ class AddToGroup(Command):
         params = {'username': self.username}
         json = {'name': self.group}
 
-        req.post('crowd', 'user/group/direct', params=params, json=json, errors=errors)
+        Requester.req.post('crowd', 'user/group/direct', params=params, json=json, errors=errors)
         print('The user {} has been added to the group {}'.format(self.username, self.group))
 
     def _undo(self):
@@ -102,4 +98,4 @@ class Get(NotUndoable):
             }
         }
 
-        return req.get('crowd', 'user', params=params, errors=errors)
+        return Requester.req.get('crowd', 'user', params=params, errors=errors)
