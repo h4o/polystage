@@ -94,3 +94,4 @@ ENV/
 
 /students.csv
 /Main.py
+/credentials.yml
