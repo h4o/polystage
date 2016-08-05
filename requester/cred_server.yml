@@ -5,7 +5,7 @@ roots:
 
 credentials:
   username: crowd
-  password: mdpfdp
+  password: password
 
 crowd:
   app: polyproject
