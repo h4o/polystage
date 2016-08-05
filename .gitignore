@@ -1,5 +1,5 @@
 .idea/
-requester/*_IGNORE*
+python/requester/*_IGNORE*
 
 ### Python template
 # Byte-compiled / optimized / DLL files
@@ -93,5 +93,5 @@ ENV/
 .ropeproject
 
 /students.csv
-/Main.py
+/python/Main.py
 /credentials.yml
