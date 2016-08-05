@@ -1,6 +1,6 @@
 from atlas import Projects, Users, Repos, PermScheme, BitbucketPerm
 from atlas.BitbucketPerm import Permission
-from schema.yaml_loader import load
+from schema.yaml_loader import load_file
 from scripts import Runner
 from scripts.Runner import ReversibleRunner, NeverUndo
 from scripts.Util import create_basic_roles, grant_jira_perms, grant_bitbucket_perms, add_users_to_project
@@ -8,7 +8,7 @@ from util.util import pp
 
 
 def load_multi_repo_file(file_name):
-    file = load(file_name, 'schema/multi_repo_template.yml')
+    file = load_file(file_name, 'schema/multi_repo_template.yml')
     params = file['params']
     params['name'] = params.get('name', params['key'])
     params['readers'] = params.get('readers', [])
@@ -20,7 +20,7 @@ def load_multi_repo_file(file_name):
     return file
 
 
-def load_multi_repo(file_name):
+def load(file_name):
     data = load_multi_repo_file(file_name)
     params, repos = data['params'], data['repos']
     script = ReversibleRunner()

@@ -15,7 +15,7 @@ class Create(Command):
             }
         }
 
-        Requester.req('crowd', 'user', json=self.user.get_crowd_format(), errors=errors)
+        Requester.req.post('crowd', 'user', json=self.user.get_crowd_format(), errors=errors)
         print('The user {} has been registered'.format(self.user.display_name))
 
     def _undo(self):

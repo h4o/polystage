@@ -20,7 +20,7 @@ class AddWithRole(NotUndoable):
                 404: 'Either the group, the role or the project does not exist or the user is already in it'
             }
         }
-        Requester.req('jira', 'project/{}/role/{}'.format(self.project_key, role_id), json={'user': [self.user]},
+        Requester.req.post('jira', 'project/{}/role/{}'.format(self.project_key, role_id), json={'user': [self.user]},
                       errors=errors)
         print('The user {} has been added to the project {} for the role {}'.format(self.user, self.project_key,
                                                                                     self.role_name))

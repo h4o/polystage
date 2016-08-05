@@ -24,7 +24,7 @@ class Requester:
 
     def __init__(self, cred_file='credentials.yml'):
         self.s = requests.Session()
-        cred = yaml_loader.load(cred_file, 'schema/credential_schema.yml')
+        cred = yaml_loader.load_file(cred_file, 'schema/credential_schema.yml')
         self.roots = cred['roots']
         self.roots['applinks'] = self.roots['jira']
         self.crowd_auth = (cred['crowd']['app'], cred['crowd']['pwd'])

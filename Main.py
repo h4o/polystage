@@ -11,16 +11,17 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 Requester.req = Requester(CredType.fab)
 
+
 def import_students():
     try:
-        script = Students.load_all()
+        script = Students.load()
     except Exception as e:
         print(e)
 
 
 def multi_project():
     try:
-        script = MultiProjects.load_multi_project('schema/ISL_script.yml')
+        script = MultiProjects.load('schema/ISL_script.yml')
         # print("\nSuccess, now reverting")
         # script.revert()
     except Exception as e:
@@ -29,7 +30,7 @@ def multi_project():
 
 def devint():
     try:
-        script = MultiRepo.load_multi_repo('schema/DEVINT_script.yml')
+        script = MultiRepo.load('schema/DEVINT_script.yml')
         # print('\nImport over, reverting')
         # script.revert()
     except Exception as e:

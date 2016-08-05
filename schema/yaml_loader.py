@@ -3,7 +3,7 @@ import yaml
 from schema import rx
 
 
-def load(file_path, schema_path=None):
+def load_file(file_path, schema_path=None):
     with open(file_path) as f:
         file = yaml.safe_load(f)
         if schema_path:

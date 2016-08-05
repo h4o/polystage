@@ -6,7 +6,7 @@ from scripts.Runner import ReversibleRunner
 
 
 def load_students_file(user_file):
-    config = yaml_loader.load(user_file)
+    config = yaml_loader.load_file(user_file)
     users = []
     with open(config['csv_file']) as f:
         users_csv = csv.reader(f, delimiter=';')
@@ -22,7 +22,7 @@ def remove_students(user_file):
         Users.Remove(student)
 
 
-def load_all(user_file='schema/import_user.yml'):
+def load(user_file='schema/import_user.yml'):
     script = ReversibleRunner()
     data = load_students_file(user_file)
     students, groups = data['users'], data['groups']
