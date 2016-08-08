@@ -3,9 +3,9 @@ from abc import ABC, abstractmethod
 from openpyxl import chart
 from openpyxl.chart import Reference
 from openpyxl.chart.label import DataLabelList
-from openpyxl.styles import Font, PatternFill
 from openpyxl.styles import Alignment
-from openpyxl.styles.colors import RED, WHITE, BLACK
+from openpyxl.styles import Font, PatternFill
+from openpyxl.styles.colors import WHITE, BLACK
 from openpyxl.utils import coordinate_to_tuple, get_column_letter
 
 

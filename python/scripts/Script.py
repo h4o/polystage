@@ -48,3 +48,22 @@ class NeverUndo:
     def __exit__(self, exc_type, exc_val, exc_tb):
         self.script.never_undo = False
 
+
+# def public(func):
+#     # registry = {}
+#     print(func)
+#
+#     def toto(*args, **kwargs):
+#         print("ok")
+#         return func(args, kwargs)  # normally a decorator returns a wrapped function,
+#
+#     # registrar.all = registry
+#     print('?')
+#     return toto
+
+registry = []
+
+
+def public(func):
+    registry.append(func)
+    return func

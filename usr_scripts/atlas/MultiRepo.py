@@ -1,23 +1,11 @@
 from python.atlas import Projects, Repos, PermScheme
-from python.scripts.Runner import ReversibleRunner, NeverUndo
+from python.scripts.Script import ReversibleRunner, NeverUndo, public
 from python.scripts.Util import create_basic_roles, grant_bitbucket_perms, add_users_to_project
 
 from python.schema.yaml_loader import load_file
 
 
-def load_multi_repo_file(file_name):
-    file = load_file(file_name, 'schema/multi_repo_template.yml')
-    params = file['params']
-    params['name'] = params.get('name', params['key'])
-    params['readers'] = params.get('readers', [])
-    params['type'] = params.get('type', 'software')
-    params['scheme_name'] = params['key'] + '_projects'
-    params['lead'] = params['supervisors'][0]
-    params['developers'] = set([dev for repo in file['repos'] for dev in repo['developers']])
-
-    return file
-
-
+@public
 def load(file_name):
     data = load_multi_repo_file(file_name)
     params, repos = data['params'], data['repos']
@@ -31,6 +19,19 @@ def load(file_name):
     _create_permissions(params, script)
 
     return script
+
+
+def load_multi_repo_file(file_name):
+    file = load_file(file_name, 'python/schema/multi_repo_template.yml')
+    params = file['params']
+    params['name'] = params.get('name', params['key'])
+    params['readers'] = params.get('readers', [])
+    params['type'] = params.get('type', 'software')
+    params['scheme_name'] = params['key'] + '_projects'
+    params['lead'] = params['supervisors'][0]
+    params['developers'] = set([dev for repo in file['repos'] for dev in repo['developers']])
+
+    return file
 
 
 def _create_project(params, script):

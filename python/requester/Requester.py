@@ -7,8 +7,8 @@ from python.schema import yaml_loader
 
 
 class CredType:
-    fab = 'requester/cred_server.yml'
-    polytech = 'requester/poly_IGNORE.yml'
+    fab = 'data/credentials.yml'
+    # polytech = 'requester/poly_IGNORE.yml'
 
 
 class Requester:
@@ -21,9 +21,9 @@ class Requester:
         'crowd': 'rest/usermanagement/1/'
     }
 
-    def __init__(self, cred_file='credentials.yml'):
+    def __init__(self, cred_file='data/credentials.yml'):
         self.s = requests.Session()
-        cred = yaml_loader.load_file(cred_file, 'schema/credential_schema.yml')
+        cred = yaml_loader.load_file(cred_file, 'python/schema/credential_template.yml')
         self.roots = cred['roots']
         self.roots['applinks'] = self.roots['jira']
         self.crowd_auth = (cred['crowd']['app'], cred['crowd']['pwd'])
@@ -61,7 +61,7 @@ class Requester:
 
         try:
             data = data or resp.json()
-        except ValueError as e:
+        except ValueError:
             pass
 
         try:

@@ -1,6 +1,5 @@
-from python.atlas import Roles, PermScheme, Projects
-
 from python.atlas import BitbucketPerm
+from python.atlas import Roles, Projects
 from python.atlas.BitbucketPerm import Permission
 
 
@@ -12,11 +11,6 @@ def create_basic_roles(script):
     'developers' in roles or script.do(Roles.Create('developers'))
     'supervisors' in roles or script.do(Roles.Create('supervisors'))
     'readers' in roles or script.do(Roles.Create('readers'))
-
-
-def grant_jira_perms(scheme_name, entity_type, entity_name, permissions, script):
-    for permission in permissions:
-        script.do(PermScheme.GrantPermission(scheme_name, entity_type, entity_name, permission))
 
 
 def grant_bitbucket_perms(project_key, script, readers=None, writers=None, admins=None):

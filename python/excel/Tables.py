@@ -28,7 +28,7 @@ class IssuesType(Table):
                 data[assignee][name] += 1
 
         self.header = ['Assignee'] + self.types
-        tuples = sorted(data.values(), key=lambda i: i['Assignee'])
+        tuples = sorted(data.values(), key=lambda u: u['Assignee'])
         self.rows = []
         for t in tuples:
             values = [t['Assignee']]
