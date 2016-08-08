@@ -1,3 +1,4 @@
+from python.exceptions.Exceptions import ScriptFailure
 from python.util import eprint
 
 
@@ -28,8 +29,7 @@ class ReversibleRunner:
         except Exception as e:
             eprint('Failure:', e, '\nTrying to undo:')
             self.revert()
-            # TODO: Create a more explicit exception
-            raise Exception("Script failure")
+            raise ScriptFailure(e)
 
     def revert(self):
         while self.history:
@@ -49,21 +49,16 @@ class NeverUndo:
         self.script.never_undo = False
 
 
-# def public(func):
-#     # registry = {}
-#     print(func)
-#
-#     def toto(*args, **kwargs):
-#         print("ok")
-#         return func(args, kwargs)  # normally a decorator returns a wrapped function,
-#
-#     # registrar.all = registry
-#     print('?')
-#     return toto
-
 registry = []
 
 
 def public(func):
     registry.append(func)
-    return func
+
+    def safely(*args, **kwargs):
+        try:
+            func(*args, **kwargs)
+        except ScriptFailure as e:
+            print(e)
+
+    return safely

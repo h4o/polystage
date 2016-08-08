@@ -20,3 +20,12 @@ class RequestException(Exception):
     def status_code(self):
         return self.response.status_code
 
+
+class ScriptFailure(Exception):
+    def __init__(self, initial_exception):
+        super(ScriptFailure, self).__init__('Script Failure', initial_exception)
+        self._initial_exception = initial_exception
+
+    @property
+    def initial_exception(self):
+        return self._initial_exception
