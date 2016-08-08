@@ -40,10 +40,10 @@ def load_multi_project_file(file_name):
 
 def _create_project(project, params, script):
     key, name, lead = project['key'], project['name'], project['lead']
-    p_type, tag = project['type'], project['tag']
+    p_type, tag = params['type'], params['tag']
     readers, supervisors, developers = project['readers'], project['supervisors'], project['developers']
 
-    script.do(Projects.CreateJira(key, name, lead, project_type=p_type, category=params['tag']))
+    script.do(Projects.CreateJira(key, name, lead, project_type=p_type, category=tag))
     script.do(Projects.CreateBitbucket(key, name))
 
     with NeverUndo(script) as never_undo:
