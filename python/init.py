@@ -1,5 +1,5 @@
 import requests
-from atlas import *
+from python.atlas import *
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from python.scripts.Script import public, registry
