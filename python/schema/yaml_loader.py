@@ -4,6 +4,8 @@ from python.schema import rx
 
 
 def load_file(file_path, schema_path=None):
+    if not file_path.endswith('.yml'):
+        file_path += '.yml'
     with open(file_path) as f:
         file = yaml.safe_load(f)
         if schema_path:

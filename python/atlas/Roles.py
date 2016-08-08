@@ -1,6 +1,6 @@
 from python.atlas.Command import NotUndoable, Command
 
-from python.requester import Requester
+from python.requester.Requester import Requester
 
 
 class Create(Command):

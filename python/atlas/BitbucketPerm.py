@@ -1,6 +1,6 @@
 from python.atlas.Command import NotUndoable
 
-from python.requester import Requester
+from python.requester.Requester import Requester
 
 
 class Permission:

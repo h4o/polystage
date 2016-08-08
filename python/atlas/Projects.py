@@ -1,7 +1,7 @@
 from python.atlas import Roles
 from python.atlas.Command import NotUndoable, Command
 
-from python.requester import Requester
+from python.requester.Requester import Requester
 
 
 class AddWithRole(NotUndoable):
