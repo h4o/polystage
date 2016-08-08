@@ -6,4 +6,4 @@ RUN pip install requests
 RUN pip install six
 
 WORKDIR /usr/src/Atlassian
-CMD [ "python", "-i", "init.py" ]
+CMD [ "python", "-i", "python/init.py" ]
