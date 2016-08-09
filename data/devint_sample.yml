@@ -1,11 +1,9 @@
 params:
-  key: PANORAMIX
+  key: DEMOREPO
   supervisors: [pe202399]
   readers: [ln404361]
 repos:
-  - name: G1-Nasca
+  - name: RepoOne
     developers: [ga201127, vf200724]
-  - name: G1-Osef
+  - name: RepoTwo
     developers: [dt202520, ml402332, ma202240]
-  - name: G2-Raycharles
-    developers: [ln404361, mp405689, ca405265, dt403958]

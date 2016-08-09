@@ -1,5 +1,5 @@
 params:
-  tag: SCHO
+  tag: DEMO
   type: software
   supervisors:
     - crowd
@@ -9,8 +9,8 @@ params:
   repositories:
     - private
 projects:
-  - id: KOLAH
+  - id: ONE
     developers: [ln404361, fl407746, jl201213, nn200057]
-  - id: ZAR
+  - id: TWO
     developers: [sl200103, st405262, nc201038, wq105385]
     supervisors: [ct106586]
