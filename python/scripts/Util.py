@@ -30,11 +30,11 @@ def grant_bitbucket_repo_perms(project_key, repo_name, script, readers=None, wri
     writers = writers or []
     admins = admins or []
     for reader in readers:
-        script.do(BitbucketPerm.GrantRepoPermission(project_key, repo_name, reader, Permission.READ))
+        script.do(BitbucketPerm.GrantRepoPermission(project_key, repo_name, reader, Permission.R_READ))
     for developer in writers:
-        script.do(BitbucketPerm.GrantRepoPermission(project_key, repo_name, developer, Permission.WRITE))
+        script.do(BitbucketPerm.GrantRepoPermission(project_key, repo_name, developer, Permission.R_WRITE))
     for supervisor in admins:
-        script.do(BitbucketPerm.GrantRepoPermission(project_key, repo_name, supervisor, Permission.ADMIN))
+        script.do(BitbucketPerm.GrantRepoPermission(project_key, repo_name, supervisor, Permission.R_ADMIN))
 
 
 def add_users_to_project(project_key, script, readers=None, developers=None, supervisors=None):

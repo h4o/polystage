@@ -47,7 +47,10 @@ class GrantRepoPermission(NotUndoable):
 
     def _do(self):
         errors = {
-            'message': 'Could not grant permission {} to user {} for repo {} from project {}',
+            'message': 'Could not grant permission {} to user {} for repo {} from project {}'.format(self.permission,
+                                                                                                     self.user_name,
+                                                                                                     self.repo_name,
+                                                                                                     self.project_key),
             'reasons': {
                 403: "The action was disallowed as it would reduce the currently authenticated user's permission level",
                 404: 'The specified repository does not exist'
@@ -60,3 +63,8 @@ class GrantRepoPermission(NotUndoable):
 
         Requester.req.put('stash', 'projects/{}/repos/{}/permissions/users'.format(self.project_key, self.repo_name),
                           params=params, errors=errors)
+
+        print('The permission {} has been grand to user {} for repo {} from project {}'.format(self.permission,
+                                                                                               self.user_name,
+                                                                                               self.repo_name,
+                                                                                               self.project_key))

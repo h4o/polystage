@@ -47,6 +47,6 @@ def _create_permissions(params, repos, script):
                               readers=params['readers'],
                               admins=params['supervisors'])
 
-    for repo in repos:
-        grant_bitbucket_repo_perms(params['key'], repos['name'], never_undo,
-                                   writers=repo['developers'])
+        for repo in repos:
+            grant_bitbucket_repo_perms(params['key'], repo['name'], never_undo,
+                                       writers=repo['developers'])
