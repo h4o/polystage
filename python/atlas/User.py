@@ -1,3 +1,6 @@
+from python.util import pw_gen
+
+
 class User:
     def __init__(self, firstname, lastname, email):
         self.firstname = firstname
@@ -16,7 +19,9 @@ class User:
     def display_name(self):
         return self.fullname
 
-    def get_crowd_format(self):
+    def get_crowd_format(self, pw_default=None):
+        if pw_default is None:
+            pw_default = pw_gen(10)
         crowd_format = {
             'name': self.username,
             'first-name': self.firstname,
@@ -24,7 +29,7 @@ class User:
             'display-name': self.display_name,
             'email': self.email,
             'password': {
-                'value': 'password'
+                'value': pw_default
             },
             'active': True
         }
