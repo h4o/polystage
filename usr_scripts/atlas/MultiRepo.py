@@ -1,6 +1,7 @@
 from python.atlas import Projects, Repos, PermScheme
 from python.scripts.Script import ReversibleRunner, NeverUndo, public
-from python.scripts.Util import create_basic_roles, grant_bitbucket_perms, add_users_to_project
+from python.scripts.Util import create_basic_roles, grant_bitbucket_perms, add_users_to_project, \
+    grant_bitbucket_repo_perms
 
 from python.schema.yaml_loader import load_file
 
@@ -13,7 +14,7 @@ def load(file_name):
 
     _create_project(params, script)
     _create_repos(params, repos, script)
-    _create_permissions(params, script)
+    _create_permissions(params, repos, script)
 
     return script
 
@@ -40,9 +41,12 @@ def _create_repos(params, repos, script):
         script.do(Repos.Create(params['key'], repo['name']))
 
 
-def _create_permissions(params, script):
+def _create_permissions(params, repos, script):
     with NeverUndo(script) as never_undo:
         grant_bitbucket_perms(params['key'], never_undo,
                               readers=params['readers'],
-                              writers=params['developers'],
                               admins=params['supervisors'])
+
+    for repo in repos:
+        grant_bitbucket_repo_perms(params['key'], repos['name'], never_undo,
+                                   writers=repo['developers'])
