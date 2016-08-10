@@ -1,21 +1,24 @@
 #Atlas Command Line Interface
 
 ##Prerequisites
-To run this project all you need is a functional installation of Docker
+To run this project all you need is a functional installation of Docker.
 
 ##How to 
 Start by cloning this repository:
-`git clone https://github.com/h4o/polystage.git`
+
+    git clone https://github.com/h4o/polystage.git
 
 Then go into the cloned repository and run the build script:
-`./build.sh`
+    
+    ./build.sh
 
-You'll never have to do this again.
+You should never have to do this again.
 
-Now you have to supply some information. Open the file `credentials.yml` in the folder `data` and complete the fields.
+You have to supply some credentials for the cli to run with the correct rights. Open the file `credentials.yml` in the folder `data` and fill the blanks.
 
 You can now run the Atlas CLI:
-`./run.sh`
+    
+    ./run.sh
 
 ##In details
 You can find the three folders `data`, `usr_scripts` and`python`
@@ -49,7 +52,6 @@ It's highly advised that you don't run the commands yourself. Instead, make use 
     
         with NeverUndo(script) as never_undo:
             never_undo.do(BitbucketPerm.GrantPermission('EXAMPLE', 'crowd', Permission.ADMIN))
-
   
 When a script uses the `ReversibleRunner`, any command failure will trigger a revert process to undo the previous commands.
 
@@ -58,10 +60,13 @@ If some commands are run with the parameter `never_undo=True` or with
     with NeverUndo(script) as never_undo:
         never_undo.do(...)
 then, any failure will still trigger a revert process, but will never try to undo these commands. 
- 
+
+In this example, if your file's name is `ThingDoer.py` you can run it directly with the following command. 
+    
+    ThingDoer.do_the_thing() 
 
 ##Adding excel scripts
-You can also add your own excel scripts. All you have to you is to implement the class `python.scripts.ExcelScript.ExcelScript`:
+You can also add your own excel scripts. All you have to do is to implement the class `python.scripts.ExcelScript.ExcelScript`:
 
 ###Example
 
@@ -81,6 +86,6 @@ You can also add your own excel scripts. All you have to you is to implement the
             self.put(PieCharts.AssigneePieChart(project['key']), ws, col=2)
             self.put(PieCharts.CommitsPie(project['key'], self.repos_name), ws)
             
-You can run such script by `IssueStats.generate('File_name.xlsx')`
+You can run such script by `IssueStats().generate('File_name.xlsx')`
 You should never have to run `generate` yourself.
 

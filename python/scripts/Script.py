@@ -57,7 +57,7 @@ def public(func):
 
     def safely(*args, **kwargs):
         try:
-            func(*args, **kwargs)
+            return func(*args, **kwargs)
         except ScriptFailure as e:
             print(e)
 

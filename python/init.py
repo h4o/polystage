@@ -6,7 +6,7 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 print('Hello there :)')
-print('Type \'help\' to know the commands available')
+print('Type helpme() to know the commands available')
 
 
 def helpme():
