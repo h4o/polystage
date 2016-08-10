@@ -1,2 +1,2 @@
-csv_file: 'data/students.csv'
-groups: ['jira-users', 'Les poids lourds de l''amour']
+csv_file: 'data/students_sample.csv'
+groups: ['jira-users', 'SI4_2015_2016']
