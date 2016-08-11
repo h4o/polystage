@@ -1,6 +1,6 @@
 from python.atlas.Command import NotUndoable, Command
-
 from python.requester.Requester import Requester
+
 
 class GetAll(NotUndoable):
     def _do(self):

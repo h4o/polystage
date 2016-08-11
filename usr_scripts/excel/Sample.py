@@ -1,6 +1,6 @@
 from python.atlas import Projects
-from python.excel import Tables, PieCharts
 from python.scripts.ExcelScript import ExcelScript
+from usr_scripts.excel.widgets import Tables, PieCharts
 
 
 class IssueStats(ExcelScript):
