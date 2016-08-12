@@ -1,5 +1,8 @@
 from python.exceptions.Exceptions import ScriptFailure
+from python.scripts.ExcelScript import ExcelScript
 from python.util import eprint
+
+atlas_scripts = []
 
 
 class ReversibleRunner:
@@ -49,11 +52,8 @@ class NeverUndo:
         self.script.never_undo = False
 
 
-registry = []
-
-
-def public(func):
-    registry.append(func)
+def command(func):
+    atlas_scripts.append(func)
 
     def safely(*args, **kwargs):
         try:

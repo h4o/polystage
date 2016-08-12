@@ -1,11 +1,11 @@
 from python.atlas import Projects, PermScheme, Applinks, Repos
-from python.scripts.Script import ReversibleRunner, NeverUndo, public
+from python.scripts.Script import ReversibleRunner, NeverUndo, command
 from python.scripts.Util import create_basic_roles, grant_bitbucket_perms, add_users_to_project
 
 from python.schema.yaml_loader import load_file
 
 
-@public
+@command
 def load(file_name):
     data = load_multi_project_file(file_name)
     params = data['params']

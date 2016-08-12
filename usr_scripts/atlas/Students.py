@@ -2,7 +2,7 @@ import csv
 
 from python.atlas import Users, Groups
 from python.atlas.User import Student
-from python.scripts.Script import ReversibleRunner, public
+from python.scripts.Script import ReversibleRunner, command
 
 from python.schema import yaml_loader
 
@@ -24,7 +24,7 @@ def remove_students(user_file):
         Users.Remove(student)
 
 
-@public
+@command
 def load(user_file='data/students'):
     script = ReversibleRunner()
     data = load_students_file(user_file)

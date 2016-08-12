@@ -1,9 +1,11 @@
 from python.atlas import Projects
 from python.scripts.ExcelScript import ExcelScript
+from python.scripts.Script import command
 from usr_scripts.excel.widgets import Tables, PieCharts
 
 
 class IssueStats(ExcelScript):
+    """Writes a bunch of graphs and pie charts in the excel file"""
     def __init__(self, project_tag, repos_name):
         super().__init__()
         self.repos_name = repos_name

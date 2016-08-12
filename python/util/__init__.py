@@ -17,3 +17,7 @@ def pp(elem):
 
 def pw_gen(size=8, chars=string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
+
+
+def parse(arg):
+    return tuple(arg.split())

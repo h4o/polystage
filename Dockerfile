@@ -5,6 +5,6 @@ RUN pip install PyYaml
 RUN pip install requests
 RUN pip install six
 
-ENV PYTHONSTARTUP "python/init.py"
+ENV PYTHONSTARTUP "python/shell.py"
 
 WORKDIR /usr/src/Atlassian
