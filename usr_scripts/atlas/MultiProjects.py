@@ -7,6 +7,7 @@ from python.schema.yaml_loader import load_file
 
 @command
 def load(file_name):
+    """Load the projects described in the yaml file given in parameters"""
     data = load_multi_project_file(file_name)
     params = data['params']
     script = ReversibleRunner()

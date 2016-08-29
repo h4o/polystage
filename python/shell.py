@@ -1,3 +1,4 @@
+import inspect
 import os
 from cmd import Cmd
 
@@ -7,12 +8,31 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from python.scripts.ExcelScript import ExcelScript
 from python.scripts.Script import atlas_scripts
 from python.util import parse
-
 from usr_scripts import *
-
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 scripts = []
+
+
+def generate_help(cmd, func):
+    doc = inspect.getdoc(func)
+    doc = doc if isinstance(doc, str) else ''
+    sig = inspect.signature(func)
+    arg_list = []
+    for name, default in sig.parameters.items():
+        arg = name
+        if isinstance(default.default, str):
+            arg = ''.join([name, '="{}"'.format(default.default)])
+
+        arg_list.append(arg)
+        if isinstance(func, ExcelScript):
+            arg_list.append('output_file')
+
+    args = ' '.join(arg_list)
+    help_msg = '{doc}\n' \
+               '    {cmd} {args}'.format(doc=doc, cmd=cmd, args=args)
+
+    return help_msg
 
 
 def add_excel(script):
@@ -27,9 +47,9 @@ def add_excel(script):
 
     setattr(Shell, 'do_{}'.format(script.__name__), generate)
 
+    help_msg = generate_help(script.__name__, script)
     if script.__doc__:
-        doc = script.__doc__ + '. The last parameters is the output file'
-        setattr(Shell, 'help_{}'.format(script.__name__), lambda self, h=doc: print(h))
+        setattr(Shell, 'help_{}'.format(script.__name__), lambda self, h=help_msg: print(h))
 
 
 def add_cmd(cmd, func, help_msg=None):
@@ -41,6 +61,11 @@ def add_cmd(cmd, func, help_msg=None):
             print(e)
 
     setattr(Shell, 'do_{}'.format(cmd), temp)
+    if func.__doc__:
+        module = func.__module__.split('.')[-1]
+        setattr(Shell, 'help_{}'.format(module), lambda self, h=func.__doc__: print(h))
+
+    help_msg = generate_help(cmd, func)
     if help_msg:
         setattr(Shell, 'help_{}'.format(cmd), lambda self, h=help_msg: print(h))
 

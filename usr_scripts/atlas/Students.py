@@ -26,6 +26,7 @@ def remove_students(user_file):
 
 @command
 def load(user_file='data/students'):
+    """Import every users from the csv file"""
     script = ReversibleRunner()
     data = load_students_file(user_file)
     students, groups = data['users'], data['groups']

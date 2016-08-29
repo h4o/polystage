@@ -8,6 +8,7 @@ from python.schema.yaml_loader import load_file
 
 @command
 def load(file_name):
+    """Load several repositories as described in the file given in parameters"""
     data = load_multi_repo_file(file_name)
     params, repos = data['params'], data['repos']
     script = ReversibleRunner()
