@@ -16,9 +16,9 @@ required:
     contents:
       type: //rec
       required:
-        id: //str
         developers: {type: //arr, contents: //str}
       optional:
+        id: //str
         name: //str
         lead: //str
         supervisors: {type: //arr, contents: //str}

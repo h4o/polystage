@@ -1,8 +1,10 @@
+from math import floor, log
+
 from python.atlas import Projects, PermScheme, Applinks, Repos
+from python.schema.yaml_loader import load_file
 from python.scripts.Script import ReversibleRunner, NeverUndo, command
 from python.scripts.Util import create_basic_roles, grant_bitbucket_perms, add_users_to_project
-
-from python.schema.yaml_loader import load_file
+from python.util import to_ascii
 
 
 @command
@@ -30,6 +32,7 @@ def load_multi_project_file(file_name):
     params['applink'] = params.get('applink', False)
     params['repositories'] = params.get('repositories', [])
     params['scheme_name'] = params['tag'] + '_projects'
+    _set_projects_ids(file)
     for project in file['projects']:
         project['key'] = params['tag'] + project['id']
         project['name'] = project.get('name', project['key'])
@@ -37,6 +40,16 @@ def load_multi_project_file(file_name):
         project['supervisors'] = set(params['supervisors'] + project.get('supervisors', []))
         project['readers'] = set(params['readers'] + project.get('readers', []))
     return file
+
+
+def _set_projects_ids(file):
+    base = 26
+    no_id = [project for project in file['projects'] if 'id' not in project]
+    if not no_id:
+        return
+    nb_digit = floor(log(len(no_id), base)) + 1
+    for ctr, project in enumerate(no_id):
+        project['id'] = to_ascii(ctr, nb_digit, base)
 
 
 def _create_project(project, params, script):

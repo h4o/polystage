@@ -21,3 +21,15 @@ def pw_gen(size=8, chars=string.ascii_letters):
 
 def parse(arg):
     return tuple(arg.split())
+
+
+def to_ascii(number, digit, base=26):
+    str_repr = []
+    while True:
+        mod = number % base
+        str_repr.insert(0, chr(mod + ord('A')))
+        number = (number - mod) // base
+        if number <= 0:
+            break
+
+    return ''.join(str_repr).rjust(digit, 'A')
