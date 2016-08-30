@@ -18,7 +18,8 @@ class Requester:
         'jira': 'rest/api/2/',
         'stash': 'rest/api/1.0/',
         'applinks': 'rest/applinks/1.0/',
-        'crowd': 'rest/usermanagement/1/'
+        'crowd': 'rest/usermanagement/1/',
+        'agile': 'rest/agile/1.0/'
     }
 
     def __init__(self, cred_file='data/credentials.yml'):
@@ -26,6 +27,7 @@ class Requester:
         cred = yaml_loader.load_file(cred_file, 'python/schema/credential_template.yml')
         self.roots = cred['roots']
         self.roots['applinks'] = self.roots['jira']
+        self.roots['agile'] = self.roots['jira']
         self.crowd_auth = (cred['crowd']['app'], cred['crowd']['pwd'])
         self.jira_auth = (cred['credentials']['username'], cred['credentials']['password'])
 
