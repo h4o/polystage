@@ -29,6 +29,9 @@ class Widget(ABC):
     def size(self):
         pass
 
+    def __str__(self):
+        return self.__class__.__name__
+
 
 class Table(Widget):
     def __init__(self):

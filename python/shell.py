@@ -14,7 +14,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 scripts = []
 
 
-def generate_help(cmd, func):
+def generate_help(cmd, func, excel=False):
     doc = inspect.getdoc(func)
     doc = doc if isinstance(doc, str) else ''
     sig = inspect.signature(func)
@@ -25,8 +25,8 @@ def generate_help(cmd, func):
             arg = ''.join([name, '="{}"'.format(default.default)])
 
         arg_list.append(arg)
-        if isinstance(func, ExcelScript):
-            arg_list.append('output_file')
+    if excel:
+        arg_list.append('output_file')
 
     args = ' '.join(arg_list)
     help_msg = '{doc}\n' \
@@ -47,7 +47,7 @@ def add_excel(script):
 
     setattr(Shell, 'do_{}'.format(script.__name__), generate)
 
-    help_msg = generate_help(script.__name__, script)
+    help_msg = generate_help(script.__name__, script, excel=True)
     if script.__doc__:
         setattr(Shell, 'help_{}'.format(script.__name__), lambda self, h=help_msg: print(h))
 
@@ -90,8 +90,6 @@ class Shell(Cmd):
 
 
 def init_shell():
-    # TODO add as a doc the parameters expected
-    # TODO is some parameters are missing, prompt them
     for f in atlas_scripts:
         m = f.__module__.split('.')[-1]
         add_cmd(m, f)

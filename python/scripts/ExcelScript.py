@@ -40,12 +40,14 @@ class ExcelScript:
             self._write_worksheet(ws)
 
     def _write_worksheet(self, ws):
+        print('Worksheet {} :'.format(ws))
         cols_sizes = {}
         wid_list = [w for w in self.widgets if w['worksheet'] == ws]
         for widget in wid_list:
             widget['widget'].update()
             cols_sizes[widget['col']] = cols_sizes.get(widget['col'], [])
             cols_sizes[widget['col']].append(widget['widget'].size[0])
+            print('  {} done'.format(widget['widget']))
         offsets = [0]
         for col, val in cols_sizes.items():
             offsets.append(offsets[-1] + max(val) + 1)
@@ -55,5 +57,3 @@ class ExcelScript:
                 ws = self.wb[widget['worksheet']]
                 widget['widget'].write(ws, 'A1', offset_col=offset_col, offset_row=offset_row)
                 offset_row += widget['widget'].size[1] + 1
-
-
