@@ -10,6 +10,7 @@ required:
       type: //str
       applink: //bool
       repositories: {type: //arr, contents: //str}
+      board: //str
 
   projects:
     type: //arr

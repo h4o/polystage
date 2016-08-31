@@ -74,6 +74,7 @@ class Shell(Cmd):
     prompt = ':'
 
     def do_EOF(self, arg):
+        """ctrl + d : exit the shell"""
         return True
 
     def do_undo(self, arg):

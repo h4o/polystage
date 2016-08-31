@@ -1,6 +1,7 @@
 from math import floor, log
 
-from python.atlas import Projects, PermScheme, Applinks, Repos
+from python.atlas import Projects, PermScheme, Applinks, Repos, Boards
+from python.atlas.Boards import BoardType
 from python.schema.yaml_loader import load_file
 from python.scripts.Script import ReversibleRunner, NeverUndo, command
 from python.scripts.Util import create_basic_roles, grant_bitbucket_perms, add_users_to_project
@@ -32,6 +33,7 @@ def load_multi_project_file(file_name):
     params['applink'] = params.get('applink', False)
     params['repositories'] = params.get('repositories', [])
     params['scheme_name'] = params['tag'] + '_projects'
+    params['board'] = params.get('board', BoardType.KANBAN)
     _set_projects_ids(file)
     for project in file['projects']:
         project['key'] = params['tag'] + project['id']
@@ -59,6 +61,8 @@ def _create_project(project, params, script):
 
     script.do(Projects.CreateJira(key, name, lead, project_type=p_type, category=tag))
     script.do(Projects.CreateBitbucket(key, name))
+
+    script.do(Boards.Create(params['board'], name))
 
     with NeverUndo(script) as never_undo:
         if params['applink']:
