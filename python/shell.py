@@ -36,10 +36,12 @@ def generate_help(cmd, func, excel=False):
 
 
 def add_excel(script):
+    nb_args_required = len(inspect.signature(script).parameters) + 1
+
     def generate(self, arg):
         try:
-            args = parse(arg)
-            # TODO Instead of -1 check the number of args, so the error when an argument is missing is more accurate
+            args = parse(arg, nb_args_required)
+
             o = script(*args[:-1])
             o.generate(*args[-1:])
         except Exception as e:
@@ -53,9 +55,12 @@ def add_excel(script):
 
 
 def add_cmd(cmd, func, help_msg=None):
+    nb_args_required = len(inspect.signature(func).parameters)
+
     def temp(self, arg):
         try:
-            script = func(*parse(arg))
+            args = parse(arg, nb_args_required)
+            script = func(*args)
             scripts.append(script)
         except Exception as e:
             print(e)

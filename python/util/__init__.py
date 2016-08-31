@@ -19,8 +19,12 @@ def pw_gen(size=8, chars=string.ascii_letters):
     return ''.join(random.choice(chars) for _ in range(size))
 
 
-def parse(arg):
-    return tuple(arg.split())
+def parse(arg, check=False):
+    args = tuple(arg.split())
+    if check:
+        if len(args) != check:
+            raise Exception('Bad number of arguments, type help for more info')
+    return args
 
 
 def to_ascii(number, digit, base=26):
