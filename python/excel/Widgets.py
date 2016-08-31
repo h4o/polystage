@@ -108,3 +108,25 @@ class LineChart(Table):
         line_chart.set_categories(categories)
 
         worksheet.add_chart(line_chart, cell)
+
+
+class BarChart(Table):
+    def __init__(self, title):
+        super().__init__()
+        self.title = title
+
+    def _write(self, worksheet, cell):
+        super(BarChart, self)._write(worksheet, cell)
+        row, col = coordinate_to_tuple(cell)
+
+        line_chart = chart.BarChart()
+        line_chart.title = self.title
+
+        data = Reference(worksheet, min_col=col + 1, min_row=row, max_row=row + len(self.rows),
+                         max_col=col + len(self.header) - 1)
+
+        categories = Reference(worksheet, min_col=col, min_row=row + 1, max_row=row + len(self.rows))
+        line_chart.add_data(data, titles_from_data=True)
+        line_chart.set_categories(categories)
+
+        worksheet.add_chart(line_chart, cell)

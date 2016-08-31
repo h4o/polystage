@@ -1,6 +1,6 @@
 from python.atlas import Projects
 from python.scripts.ExcelScript import ExcelScript
-from usr_scripts.excel.widgets import Tables, PieCharts, LineCharts
+from usr_scripts.excel.widgets import Tables, PieCharts, LineCharts, BarCharts
 
 
 class IssueStats(ExcelScript):
@@ -23,8 +23,9 @@ class IssueStats(ExcelScript):
 
 
 class SimpleLineChart(ExcelScript):
-    """An excel script to try line charts"""
+    """An excel script to try line charts and bar charts"""
 
     def _generate(self):
         ws = self.new_sheet('Tasks')
         self.put(LineCharts.BSLine(), ws)
+        self.put(BarCharts.BSBar(), ws, col=2)
