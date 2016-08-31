@@ -1,11 +1,11 @@
 from python.atlas import Projects
 from python.scripts.ExcelScript import ExcelScript
-from python.scripts.Script import command
-from usr_scripts.excel.widgets import Tables, PieCharts
+from usr_scripts.excel.widgets import Tables, PieCharts, LineCharts
 
 
 class IssueStats(ExcelScript):
     """Writes a bunch of graphs and pie charts in the excel file"""
+
     def __init__(self, project_tag, repos_name):
         super().__init__()
         self.repos_name = repos_name
@@ -20,3 +20,11 @@ class IssueStats(ExcelScript):
             self.put(PieCharts.IssuesStatusPieChart(project['key']), ws, col=2)
             self.put(PieCharts.AssigneePieChart(project['key']), ws, col=2)
             self.put(PieCharts.CommitsPie(project['key'], self.repos_name), ws)
+
+
+class SimpleLineChart(ExcelScript):
+    """An excel script to try line charts"""
+
+    def _generate(self):
+        ws = self.new_sheet('Tasks')
+        self.put(LineCharts.BSLine(), ws)
