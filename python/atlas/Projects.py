@@ -162,17 +162,17 @@ class GetIssues(NotUndoable):
     """Fetching every issues is long, so this command caches its result
     To force a new fetch, set the argument force to true"""
 
-    cache = None
+    cache = {}
 
     def __init__(self, project_key, force=False):
         self.force = force
         self.project_key = project_key
 
     def _do(self):
-        if GetIssues.cache is None or self.force:
-            GetIssues.cache = Requester.req.get('jira', 'search?jql=project={}&maxResults=-1'.format(self.project_key))[
-                'issues']
-        return GetIssues.cache
+        if self.project_key not in GetIssues.cache or self.force:
+            issues = Requester.req.get('jira', 'search?jql=project={}&maxResults=-1'.format(self.project_key))['issues']
+            GetIssues.cache[self.project_key] = issues
+        return GetIssues.cache[self.project_key]
 
 
 class GetIssueTypes(NotUndoable):

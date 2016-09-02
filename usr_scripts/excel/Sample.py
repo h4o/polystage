@@ -20,6 +20,7 @@ class IssueStats(ExcelScript):
             self.put(PieCharts.IssuesStatusPieChart(project['key']), ws, col=2)
             self.put(PieCharts.AssigneePieChart(project['key']), ws, col=2)
             self.put(PieCharts.CommitsPie(project['key'], self.repos_name), ws)
+            self.put(BarCharts.CreatedCompletedBar(project['key']), ws, col=3)
 
 
 class SimpleLineChart(ExcelScript):

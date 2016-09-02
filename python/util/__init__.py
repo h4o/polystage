@@ -2,6 +2,7 @@ import pprint
 import sys
 import string
 import random
+from itertools import groupby
 
 __all__ = ['eprint']
 
@@ -37,3 +38,7 @@ def to_ascii(number, digit, base=26):
             break
 
     return ''.join(str_repr).rjust(digit, 'A')
+
+
+def sort_groupby(iterable, key):
+    return groupby(sorted(iterable, key=key), key=key)
