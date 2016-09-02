@@ -30,3 +30,4 @@ class SimpleLineChart(ExcelScript):
         ws = self.new_sheet('Tasks')
         self.put(LineCharts.BSLine(), ws)
         self.put(BarCharts.BSBar(), ws, col=2)
+        self.put(BarCharts.CommitDiffBar(), ws)

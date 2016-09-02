@@ -79,10 +79,22 @@ class GetCommits(NotUndoable):
         errors = {
             'message': 'Could not get commits for repository {} from project {}'.format(self.repo, self.project_key),
             'reasons': {
-                400: 'One of the supplied id',
                 404: 'The repository does not exist'
             }
         }
         result = Requester.req.get('stash', 'projects/{}/repos/{}/commits'.format(self.project_key, self.repo),
                                    errors=errors)
         return result['values']
+
+
+class GetCommitDiff(NotUndoable):
+    def __init__(self, project_key, repo, commit_id):
+        self.project_key = project_key
+        self.repo = repo
+        self.commit_id = commit_id
+
+    def _do(self):
+        url = 'projects/{}/repos/{}/commits/{}/diff'.format(self.project_key, self.repo, self.commit_id)
+        commit = Requester.req.get('stash', url)
+
+        return commit

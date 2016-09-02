@@ -1,3 +1,5 @@
+import json
+
 from python.atlas import Projects
 from python.excel.Widgets import BarChart
 from python.util import sort_groupby
@@ -39,3 +41,23 @@ class CreatedCompletedBar(BarChart):
             nb_closed = nb_closed_by.get(user, 0)
 
             self.append(user, nb_created, nb_closed)
+
+
+class CommitDiffBar(BarChart):
+    def __init__(self):
+        super().__init__('Commit differences')
+        self.header = ['Commit', 'Delta']
+
+    def update(self):
+        commits = json.load(open('megadiff.json'))
+
+        deltas = []
+        for index, commit in enumerate(commits):
+            commit_delta = 0
+            for diff in commit['diffs']:
+                for hunk in diff.get('hunks', {}):
+                    hunk_delta = hunk['destinationSpan'] - hunk['sourceSpan']
+                    commit_delta += hunk_delta
+            deltas.insert(0, commit_delta)
+            self.append(index, commit_delta)
+        # pprint(deltas)
