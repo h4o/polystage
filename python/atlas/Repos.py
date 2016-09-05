@@ -2,6 +2,7 @@ from python.atlas.Command import NotUndoable, Command
 from python.requester.Requester import Requester
 
 from python.exceptions import Exceptions
+from python.util import ProgressBar
 
 
 class Create(Command):
@@ -98,3 +99,28 @@ class GetCommitDiff(NotUndoable):
         commit = Requester.req.get('stash', url)
 
         return commit
+
+
+class GetAllCommitDiffs(NotUndoable):
+    cache = {}
+
+    def __init__(self, project_key, repo, force=False):
+        self.project_key = project_key
+        self.repo = repo
+        self.force = force
+
+    def _do(self):
+        key = (self.project_key, self.repo)
+        cache = GetAllCommitDiffs.cache
+        if key not in cache or self.force:
+            commits = GetCommits(self.project_key, self.repo).do()
+            pb = ProgressBar(len(commits))
+            cache[key] = []
+            for commit in commits:
+                diff = GetCommitDiff(self.project_key, self.repo, commit['id']).do()
+                diff['commit'] = commit
+                cache[key].append(diff)
+                pb.increment()
+                pb.print()
+        diffs = cache[key]
+        return diffs

@@ -1,6 +1,6 @@
-import json
+import collections
 
-from python.atlas import Projects
+from python.atlas import Projects, Repos
 from python.excel.Widgets import BarChart
 from python.util import sort_groupby
 
@@ -46,18 +46,16 @@ class CreatedCompletedBar(BarChart):
 class CommitDiffBar(BarChart):
     def __init__(self):
         super().__init__('Commit differences')
-        self.header = ['Commit', 'Delta']
+        self.header = ['User', 'Lines added']
 
     def update(self):
-        commits = json.load(open('megadiff.json'))
-
-        deltas = []
+        commits = Repos.GetAllCommitDiffs('ISLBD', 'private').do()
+        deltas = collections.defaultdict(lambda: 0)
         for index, commit in enumerate(commits):
             commit_delta = 0
             for diff in commit['diffs']:
                 for hunk in diff.get('hunks', {}):
-                    hunk_delta = hunk['destinationSpan'] - hunk['sourceSpan']
-                    commit_delta += hunk_delta
-            deltas.insert(0, commit_delta)
-            self.append(index, commit_delta)
-        # pprint(deltas)
+                    commit_delta += hunk['destinationSpan'] - hunk['sourceSpan']
+            deltas[commit['commit']['author']['name']] += commit_delta
+        for author, delta in deltas.items():
+            self.append(author, delta)

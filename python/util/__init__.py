@@ -42,3 +42,19 @@ def to_ascii(number, digit, base=26):
 
 def sort_groupby(iterable, key):
     return groupby(sorted(iterable, key=key), key=key)
+
+
+class ProgressBar:
+    def __init__(self, nb_iter):
+        self.nb_iter = nb_iter
+        self.counter = 0
+
+    def increment(self):
+        self.counter += 1
+
+    def print(self):
+        percent = self.counter * 100 // self.nb_iter
+        sys.stdout.write('\r{}%'.format(percent))
+        if self.counter == self.nb_iter:
+            sys.stdout.write('\n')
+        sys.stdout.flush()
