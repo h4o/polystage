@@ -1,6 +1,7 @@
 from python.atlas import Projects
 from python.scripts.ExcelScript import ExcelScript
 from usr_scripts.excel.widgets import Tables, PieCharts, LineCharts, BarCharts
+from usr_scripts.excel.widgets.BarCharts import IssuesResolutionTimes
 
 
 class IssueStats(ExcelScript):
@@ -30,4 +31,5 @@ class SimpleLineChart(ExcelScript):
         ws = self.new_sheet('Tasks')
         self.put(LineCharts.BSLine(), ws)
         self.put(BarCharts.BSBar(), ws, col=2)
-        self.put(BarCharts.CommitDiffBar(), ws)
+        self.put(BarCharts.CommitDiffBar('ISLBD', 'private'), ws)
+        self.put(IssuesResolutionTimes('ISLBD'), ws)

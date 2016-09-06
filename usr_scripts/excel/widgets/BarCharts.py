@@ -1,4 +1,5 @@
 import collections
+from datetime import datetime
 
 from python.atlas import Projects, Repos
 from python.excel.Widgets import BarChart
@@ -44,12 +45,14 @@ class CreatedCompletedBar(BarChart):
 
 
 class CommitDiffBar(BarChart):
-    def __init__(self):
+    def __init__(self, project_key, repo):
         super().__init__('Commit differences')
         self.header = ['User', 'Lines added']
+        self.project_key = project_key
+        self.repo = repo
 
     def update(self):
-        commits = Repos.GetAllCommitDiffs('ISLBD', 'private').do()
+        commits = Repos.GetAllCommitDiffs(self.project_key, self.repo).do()
         deltas = collections.defaultdict(lambda: 0)
         for index, commit in enumerate(commits):
             commit_delta = 0
@@ -59,3 +62,34 @@ class CommitDiffBar(BarChart):
             deltas[commit['commit']['author']['name']] += commit_delta
         for author, delta in deltas.items():
             self.append(author, delta)
+
+
+class IssuesResolutionTimes(BarChart):
+    def __init__(self, project):
+        super().__init__('Issues resolution times')
+        self.project = project
+        self.header = ['Resolution time(days)', 'Number of issues']
+
+    def update(self):
+        issues = Projects.GetIssues('ISLBD').do()
+        format_str = '%Y-%m-%dT%H:%M:%S.%f'
+
+        for issue_str in issues:
+            creation_date_str = issue_str['fields']['created'].partition('+')[0]
+            done_date_str = issue_str['fields']['resolutiondate']
+
+            creation_date = datetime.strptime(creation_date_str, format_str)
+
+            if done_date_str is not None:
+                done_date = datetime.strptime(done_date_str.partition('+')[0], format_str)
+            else:
+                done_date = datetime.now()
+
+            issue_str['fields']['dates'] = {}
+            dates = issue_str['fields']['dates']
+            dates['created'], dates['resolved'], dates['delta'] = creation_date, done_date, done_date - creation_date
+
+        grouped = sort_groupby(issues, lambda i: i['fields']['dates']['delta'].days)
+
+        for key, issues in grouped:
+            self.append(key, len(list(issues)))

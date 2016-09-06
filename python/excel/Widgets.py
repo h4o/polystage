@@ -106,6 +106,7 @@ class LineChart(Table):
         categories = Reference(worksheet, min_col=col, min_row=row + 1, max_row=row + len(self.rows))
         line_chart.add_data(data, titles_from_data=True)
         line_chart.set_categories(categories)
+        line_chart.x_axis.title = self.header[0]
 
         worksheet.add_chart(line_chart, cell)
 
@@ -119,14 +120,15 @@ class BarChart(Table):
         super(BarChart, self)._write(worksheet, cell)
         row, col = coordinate_to_tuple(cell)
 
-        line_chart = chart.BarChart()
-        line_chart.title = self.title
+        bar_chart = chart.BarChart()
+        bar_chart.title = self.title
 
         data = Reference(worksheet, min_col=col + 1, min_row=row, max_row=row + len(self.rows),
                          max_col=col + len(self.header) - 1)
 
         categories = Reference(worksheet, min_col=col, min_row=row + 1, max_row=row + len(self.rows))
-        line_chart.add_data(data, titles_from_data=True)
-        line_chart.set_categories(categories)
+        bar_chart.add_data(data, titles_from_data=True)
+        bar_chart.set_categories(categories)
+        bar_chart.x_axis.title = self.header[0]
 
-        worksheet.add_chart(line_chart, cell)
+        worksheet.add_chart(bar_chart, cell)
