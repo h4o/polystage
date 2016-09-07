@@ -38,10 +38,10 @@ class User:
 
 class Student(User):
     def __init__(self, row):
-        super(Student, self).__init__(row[2], row[1], row[4])
-        self.year = row[0]
-        self.unice_id = row[3]
-        self.mystery_field = row[5]
+        super(Student, self).__init__(row[1], row[0], row[3])
+        self.year = None
+        self.unice_id = row[2]
+        self.mystery_field = None
         self.ine = row[7]
 
     @property
