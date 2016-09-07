@@ -16,8 +16,7 @@ class ExcelScript:
 
     def generate(self, file_name):
         self._generate()
-        self._write()
-        self.wb.save(file_name)
+        self._write(file_name)
 
     @abstractmethod
     def _generate(self):
@@ -40,9 +39,13 @@ class ExcelScript:
             'widget': widget
         })
 
-    def _write(self):
+    def _write(self, file_name):
         for ws in self.wb.sheetnames:
-            self._write_worksheet(ws)
+            try:
+                self._write_worksheet(ws)
+            except Exception as e:
+                print("The worksheet generation for '{}' failed : {}".format(ws, e))
+            self.wb.save(file_name)
 
     def _write_worksheet(self, ws):
         print('Worksheet {} :'.format(ws))
