@@ -1,5 +1,4 @@
 from python.exceptions.Exceptions import ScriptFailure
-from python.scripts.ExcelScript import ExcelScript
 from python.util import eprint
 
 atlas_scripts = []

@@ -2,12 +2,17 @@ from abc import abstractmethod
 
 from openpyxl import Workbook
 
+from usr_scripts.excel.widgets.Header import Header
+
 
 class ExcelScript:
-    def __init__(self):
+    def __init__(self, title='', description=''):
         self.wb = Workbook()
         self.nb_sheets = 0
         self.widgets = []
+        self.header = None
+        if title and description:
+            self.header = Header(title, description)
 
     def generate(self, file_name):
         self._generate()
@@ -41,6 +46,10 @@ class ExcelScript:
 
     def _write_worksheet(self, ws):
         print('Worksheet {} :'.format(ws))
+        header_offset_row = 0 if self.header is None else self.header.size[1]
+        if self.header:
+            self.header.write(self.wb[ws], 'A1', 0, 0)
+
         cols_sizes = {}
         wid_list = [w for w in self.widgets if w['worksheet'] == ws]
         for widget in wid_list:
@@ -52,8 +61,8 @@ class ExcelScript:
         for col, val in cols_sizes.items():
             offsets.append(offsets[-1] + max(val) + 1)
         for col, offset_col in enumerate(offsets):
-            offset_row = 0
+            offset_row = header_offset_row + 1
             for widget in [w for w in wid_list if w['col'] == col + 1]:
-                ws = self.wb[widget['worksheet']]
-                widget['widget'].write(ws, 'A1', offset_col=offset_col, offset_row=offset_row)
+                worksheet = self.wb[widget['worksheet']]
+                widget['widget'].write(worksheet, 'A1', offset_col=offset_col, offset_row=offset_row)
                 offset_row += widget['widget'].size[1] + 1

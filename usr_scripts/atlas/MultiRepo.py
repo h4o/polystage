@@ -1,7 +1,6 @@
-from python.atlas import Projects, Repos, PermScheme
+from python.atlas import Projects, Repos
 from python.scripts.Script import ReversibleRunner, NeverUndo, command
-from python.scripts.Util import create_basic_roles, grant_bitbucket_perms, add_users_to_project, \
-    grant_bitbucket_repo_perms
+from python.scripts.Util import grant_bitbucket_perms, grant_bitbucket_repo_perms
 
 from python.schema.yaml_loader import load_file
 

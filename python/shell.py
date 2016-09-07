@@ -1,3 +1,4 @@
+from usr_scripts import *
 import inspect
 import os
 from cmd import Cmd
@@ -8,7 +9,6 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from python.scripts.ExcelScript import ExcelScript
 from python.scripts.Script import atlas_scripts
 from python.util import parse
-from usr_scripts import *
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 scripts = []
