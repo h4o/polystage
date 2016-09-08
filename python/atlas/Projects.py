@@ -4,7 +4,7 @@ from python.atlas.Command import NotUndoable, Command
 from python.requester.Requester import Requester
 
 
-class AddWithRole(NotUndoable):
+class AddWithRole(Command):
     def __init__(self, project_key, user, role_name):
         self.project_key = project_key
         self.user = user
@@ -24,6 +24,25 @@ class AddWithRole(NotUndoable):
                            errors=errors)
         print('The user {} has been added to the project {} for the role {}'.format(self.user, self.project_key,
                                                                                     self.role_name))
+
+    def _undo(self):
+        RemoveFromRole(self.project_key, self.user, self.role_name).do()
+
+
+class RemoveFromRole(NotUndoable):
+    def __init__(self, project_key, user, role_name):
+        self.project_key = project_key
+        self.user = user
+        self.role_name = role_name
+
+    def _do(self):
+        role = Roles.Get(self.role_name).do() or {}
+        role_id = role.get('id', None)
+
+        params = {'user': self.user}
+        Requester.req.delete('jira', 'project/{}/role/{}'.format(self.project_key, role_id), params=params)
+        print('The user {} has been removed from the project {} for the role {}'.format(self.user, self.project_key,
+                                                                                        self.role_name))
 
 
 class CreateJira(Command):
