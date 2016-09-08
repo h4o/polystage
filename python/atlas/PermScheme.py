@@ -38,12 +38,13 @@ class Delete(NotUndoable):
         print('The permission {} has been deleted'.format(self.scheme_name))
 
 
-class GrantPermission(NotUndoable):
+class GrantPermission(Command):
     def __init__(self, scheme_name, e_type, name, perm):
         self.scheme_name = scheme_name
         self.type = e_type
         self.name = name
         self.perm = perm
+        self.perm_id = None
 
     def _do(self):
         """
@@ -67,7 +68,23 @@ class GrantPermission(NotUndoable):
         response = Requester.req.post('jira', 'permissionscheme/{}/permission'.format(scheme['id']), json=json,
                                       errors=errors)
         print('The permission {} for the {} {} has been created'.format(self.perm, self.type, self.name))
+        self.perm_id = response['id']
         return response
+
+    def _undo(self):
+        DeletePermission(self.scheme_name, self.perm_id).do()
+
+
+class DeletePermission(NotUndoable):
+    def __init__(self, scheme_name, permission_id):
+        self.scheme_name = scheme_name
+        self.permission_id = permission_id
+
+    def _do(self):
+        scheme = Get(self.scheme_name).do()
+        Requester.req.delete('jira', 'permissionscheme/{}/permission/{}'.format(scheme['id'], self.permission_id))
+
+        print('The permission {} for the scheme {} has been deleted'.format(self.permission_id, self.scheme_name))
 
 
 class UpdatePermissions(NotUndoable):
