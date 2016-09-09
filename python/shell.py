@@ -1,3 +1,5 @@
+from shutil import rmtree
+
 from usr_scripts import *
 import inspect
 import os
@@ -8,7 +10,8 @@ from requests.packages.urllib3.exceptions import InsecureRequestWarning
 
 from python.scripts.ExcelScript import ExcelScript
 from python.scripts.Script import atlas_scripts
-from python.util import parse
+from python.util import parse, sort_groupby
+
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 scripts = []
@@ -93,6 +96,38 @@ class Shell(Cmd):
         """Display files in the data folder"""
         print(', '.join(os.listdir('data')))
 
+    def do_test(self, arg):
+        repo_path = 'tmp_repo'
+        from git import Repo
+        url = 'https://pol-lecour:mdp@atlas.i3s.unice.fr/stash/scm/islbd/private.git'
+        repo = Repo.clone_from(url, repo_path)
+        logs = repo.git.log('--numstat', '--no-merges').splitlines()
+
+        blocs_lines = [index for index, line in enumerate(logs) if line.startswith('commit')]
+        blocs = [logs[blocs_lines[i]:blocs_lines[i + 1] - 1] for i in range(0, len(blocs_lines) - 1)]
+
+        deltas_bulk = []
+        for bloc in blocs:
+            bloc_str = '\n'.join(bloc)
+
+            commit_id = bloc[0].rpartition(' ')[-1]
+            author = bloc[1].partition(': ')[-1].rpartition(' ')[0]
+            lines = bloc_str.rpartition('\n\n')[-1]
+            commit_delta = 0
+            for line in lines.splitlines():
+                stats = line.split('\t')
+                adds = stats[0]
+                dels = stats[1]
+
+                if adds == '-' or dels == '-':
+                    continue
+                commit_delta += int(adds) - int(dels)
+            deltas_bulk.append([author, commit_delta])
+
+        deltas = sort_groupby(deltas_bulk, key=lambda d: d[0])
+        for author, delta in deltas:
+            print(author, '=>', len(list(delta)))
+        rmtree(repo_path)
 
 def init_shell():
     for f in atlas_scripts:
