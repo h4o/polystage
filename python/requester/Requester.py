@@ -22,6 +22,10 @@ class Requester:
         'agile': 'rest/agile/1.0/'
     }
 
+    @property
+    def git_cred(self):
+        return ':'.join(self.jira_auth)
+
     def __init__(self, cred_file='data/credentials.yml'):
         self.s = requests.Session()
         cred = yaml_loader.load_file(cred_file, 'python/schema/credential_template.yml')

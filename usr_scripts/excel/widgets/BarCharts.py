@@ -64,6 +64,22 @@ class CommitDiffBar(BarChart):
             self.append(author, delta)
 
 
+class CommitDiffBar_Git(BarChart):
+    def __init__(self, project_key, repo):
+        super().__init__('Commit differences')
+        self.header = ['User', 'Lines added']
+        self.project_key = project_key
+        self.repo = repo
+
+    def update(self):
+        commits = Repos.GetAllCommitsDiffsGit(self.project_key, self.repo).do()
+        grouped = sort_groupby(commits, key=lambda c: c['author'])
+
+        for author, commits in grouped:
+            delta = sum([c['created'] - c['deleted'] for c in commits])
+            self.append(author, delta)
+
+
 class IssuesResolutionTimes(BarChart):
     def __init__(self, project):
         super().__init__('Issues resolution times')

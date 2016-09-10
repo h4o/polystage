@@ -32,7 +32,7 @@ class SimpleLineChart(ExcelScript):
 
     def _generate(self):
         ws = self.new_sheet('Tasks')
-        self.put(BarCharts.CommitDiffBar('ISLBD', 'private'), ws)
+        self.put(BarCharts.CommitDiffBar_Git('ISLBD', 'private'), ws)
         # self.put(LineCharts.BSLine(), ws)
         # self.put(BarCharts.BSBar(), ws, col=2)
         # self.put(IssuesResolutionTimes('ISLBD'), ws)
