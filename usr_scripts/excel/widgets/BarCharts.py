@@ -1,4 +1,5 @@
 import collections
+from abc import abstractmethod
 from datetime import datetime
 
 from python.atlas import Projects, Repos
@@ -51,33 +52,33 @@ class CommitDiffBar(BarChart):
         self.project_key = project_key
         self.repo = repo
 
-    def update(self):
-        commits = Repos.GetAllCommitDiffs(self.project_key, self.repo).do()
-        deltas = collections.defaultdict(lambda: 0)
-        for index, commit in enumerate(commits):
-            commit_delta = 0
-            for diff in commit['diffs']:
-                for hunk in diff.get('hunks', {}):
-                    commit_delta += hunk['destinationSpan'] - hunk['sourceSpan']
-            deltas[commit['commit']['author']['name']] += commit_delta
-        for author, delta in deltas.items():
-            self.append(author, delta)
-
-
-class CommitDiffBar_Git(BarChart):
-    def __init__(self, project_key, repo):
-        super().__init__('Commit differences')
-        self.header = ['User', 'Lines added']
-        self.project_key = project_key
-        self.repo = repo
+    @abstractmethod
+    def _get_commits(self):
+        pass
 
     def update(self):
-        commits = Repos.GetAllCommitsDiffsGit(self.project_key, self.repo).do()
+        commits = self._get_commits()
         grouped = sort_groupby(commits, key=lambda c: c['author'])
 
         for author, commits in grouped:
             delta = sum([c['created'] - c['deleted'] for c in commits])
             self.append(author, delta)
+
+
+class CommitDiffBar_Git(CommitDiffBar):
+    def __init__(self, project_key, repo):
+        super().__init__(project_key, repo)
+
+    def _get_commits(self):
+        return Repos.GetAllCommitsDiffsGit(self.project_key, self.repo).do()
+
+
+class CommitDiffBar_Atlas(CommitDiffBar):
+    def __init__(self, project_key, repo):
+        super().__init__(project_key, repo)
+
+    def _get_commits(self):
+        return Repos.GetAllCommitDiffs(self.project_key, self.repo).do()
 
 
 class IssuesResolutionTimes(BarChart):

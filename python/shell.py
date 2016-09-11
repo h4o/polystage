@@ -95,7 +95,6 @@ class Shell(Cmd):
         print(', '.join(os.listdir('data')))
 
 
-
 def init_shell():
     for f in atlas_scripts:
         m = f.__module__.split('.')[-1]

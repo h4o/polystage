@@ -1,3 +1,4 @@
+from collections import defaultdict
 from shutil import rmtree
 from uuid import uuid4
 
@@ -122,12 +123,33 @@ class GetAllCommitDiffs(NotUndoable):
             cache[key] = []
             for commit in commits:
                 diff = GetCommitDiff(self.project_key, self.repo, commit['id']).do()
-                diff['commit'] = commit
-                cache[key].append(diff)
+                commit['diffs'] = diff['diffs']
+                cache[key].append(commit)
                 pb.increment()
                 pb.print()
-        diffs = cache[key]
-        return diffs
+
+        commits = cache[key]
+
+        commits_diffs = []
+        for commit in commits:
+            commit_id = commit['id']
+            author = commit['author']['name']
+            commit_delta = defaultdict(lambda: 0)
+            for diff in commit['diffs']:
+                if 'hunks' not in diff: continue
+                for hunk in diff['hunks']:
+                    for segment in hunk['segments']:
+                        type = segment['type']
+                        commit_delta[type] += len(segment['lines'])
+
+            commits_diffs.append({
+                'commit_id': commit_id,
+                'author': author,
+                'created': commit_delta['ADDED'],
+                'deleted': commit_delta['REMOVED']
+            })
+
+        return commits_diffs
 
 
 class GetAllCommitsDiffsGit(NotUndoable):
