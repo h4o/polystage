@@ -1,9 +1,9 @@
-#Atlas Command Line Interface
+# Atlas Command Line Interface
 
-##Prerequisites
+## Prerequisites
 To run this project all you need is a functional installation of Docker.
 
-##How to 
+## How to 
 Start by cloning this repository:
 
     git clone https://github.com/h4o/polystage.git
@@ -20,14 +20,14 @@ You can now run the Atlas CLI:
     
     ./run.sh
 
-##In details
+## In details
 You can find the three folders `data`, `usr_scripts` and`python`
 `python` is the code of the project, you should never have to look into it.
 `data` contains any file you need to configure your scripts. When a script need a file, it looks for it in the folder `data` first.
 `usr_scripts`contains the scripts you can run. Any python module in this folder is automatically loaded whe the application starts.
 
 
-##Adding new scripts
+## Adding new scripts
 Scripts are high level python modules using commands. They are meant to be run though the CLI.
 To add new scripts, you just need to put them in the folder `usr_scripts/atlas` and run the CLI. The autocompletion will guide you.
 
@@ -36,13 +36,13 @@ You can import in your script every commands this way:
 Or select only the modules you need:
 `from python.atlas import Projects, Users`
 
-###In short
+### In short
 - Scripts are python modules (files) in which a function is annotated `@command` and this function returns a `ReversibleRunner`
 - Scripts are placed in the folder `usr_scripts/atlas`
 - Scripts are run by the CLI with the name of the module
 - The CLI runs the method annotated `@command`
 
-###Example:
+### Example:
 
     # MyScript.py
     from python.atlas import Projects, Users, Repos, BitbucketPerm
@@ -66,14 +66,14 @@ The function `do_the_thing` is annotated `@command` which makes it the entry poi
 Since a script uses the `ReversibleRunner`, any command failure will trigger a revert process to undo the previous commands.
 The instance of the `ReversibleRunner` used to run the commands is returned at the end, so the user can manually undo the script with the command `undo`
 
-###The never_undo methods
+### The never_undo methods
 If some commands are run with the parameter `never_undo=True` or with
 
     with NeverUndo(script) as never_undo:
         never_undo.do(...)
 then, any failure will still trigger a revert process, but will never try to undo these commands.
 
-###Example:
+### Example:
 
     # Students.py
     
@@ -97,7 +97,7 @@ Now imagine if the addition in the last group of the last student in the list fa
 The `never_undo` parameter you can see set to `True` will tell the script it doesn't need to undo this action after a failure. So the only undoable operation remaining are the users creations. 
 
 
-##Adding excel scripts
+## Adding excel scripts
 Excel scripts are high level python classes using widgets (Charts, tables, ...) to generate a Excel file.
 
 To implement you own excel scripts simply derive from the class `python.scripts.ExcelScript.ExcelScript` and implement the method `_generate`
@@ -106,7 +106,7 @@ You have two methods at your disposal to handle the excel file.
 `self.new_sheet()` which will create and return a new worksheet of the name given in parameters.
 `self.put()` which write the given widget in the given worksheet. Put's `col` parameter can be set to arrange the widgets horizontally.
 
-###In short
+### In short
 - An excel script inherits the class `ExcelScript` and implement the method `_generate`
 - Excel scripts are placed in the folder `usr_scripts/excel`
 - Excel scripts are run by the CLI with its direct name (the name of the class). Its parameters are the same as its constructor's
@@ -114,7 +114,7 @@ You have two methods at your disposal to handle the excel file.
 - Excel scripts manipulates widgets and excel worksheets with the methods `self.new_sheet()` and `self.put(widget, sheet)`
 - Calling its super constructor with the arguments `title` and `description` will add put a header in the worksheets with the date the file was generated
 
-###Example
+### Example
 
     class IssueStats(ExcelScript):
         """Writes a bunch of graphs and pie charts in the excel file"""
@@ -138,14 +138,14 @@ Its constructor has two parameters `project_tag` and `repos_name`. The CLI comma
 
 The class is commented, so the CLI command `help IssueStats` will display `Writes a bunch of graphs and pie charts in the excel file` when called.
 
-##The widgets
+## The widgets
 There are currently two kinds of widgets : `Table` and `PieChart` from `python.excel.Widgets`, and both can be extended by implementing the method `update` which purpose is to retrieve the data used to write the Table or draw the Pie Chart.
 In excel, everything is more or less a table. So both the Table and the PieChart need to be given its data in a table form, through the class member `self.rows`, which is a list of the table rows (a list of list of strings), and `self.header`, which is the header of the table.
 You can use the method `self.append` to add values to the bottom of your table.
 
 The creation of the PieChart only take into account the two first columns of its table. The left one for the labels and the right one for the values. 
 
-###Example
+### Example
 
     class SamplePieChart(PieChart):
         def __init__(self):
